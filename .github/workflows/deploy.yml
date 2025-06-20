@@ -48,8 +48,6 @@ jobs:
         host: ${{ secrets.SERVER_IP }}
         username: ${{ secrets.GIT_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # Alternative: Use password authentication (less secure)
-        # password: ${{ secrets.SSH_PASSWORD }}
         debug: true
         script: |
           set -e
@@ -62,11 +60,49 @@ jobs:
           cd Tribute-front
           echo "Frontend directory: $(pwd)"
           ls -la
-          if [ -f "./deploy.sh" ]; then
-            chmod +x ./deploy.sh
-            ./deploy.sh
+          
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+          echo "🔨 Building application..."
+          npm run build
+          
+          echo "✅ Build verification..."
+          if [ -d "dist" ]; then
+            echo "✅ Build successful! Dist directory created."
+            echo "📁 Build contents:"
+            ls -la dist/
           else
-            echo "❌ deploy.sh not found!"
+            echo "❌ Build failed! Dist directory not found."
             exit 1
           fi
-          echo "Frontend deployment completed successfully!" 
+          
+          echo "🚀 Starting application..."
+          # Stop any existing process
+          pkill -f "npm.*start" || true
+          pkill -f "node.*dist" || true
+          
+          # Start the application in background
+          nohup npm start > app.log 2>&1 &
+          
+          echo "⏳ Waiting for application to start..."
+          sleep 5
+          
+          # Check if application is running
+          if pgrep -f "npm.*start" > /dev/null; then
+            echo "✅ Application started successfully!"
+            echo "📋 Application logs:"
+            tail -n 10 app.log
+          else
+            echo "❌ Application failed to start!"
+            echo "📋 Error logs:"
+            cat app.log
+            exit 1
+          fi
+          
+          echo "Frontend deployment completed successfully!"
+        port: 22
+        timeout: 30s
+        command_timeout: 10m
+        proxy_port: 22
+        proxy_timeout: 30s 
