@@ -56,8 +56,31 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "User: $(whoami)"
           
-          # Set repository path with fallback
-          REPO_PATH="${VPS_PEROSITORY_PATH:-/home/$USER/Tribute}"
+          # Debug: Show environment variables
+          echo "🔍 Debug: VPS_PEROSITORY_PATH = '${VPS_PEROSITORY_PATH:-NOT_SET}'"
+          echo "🔍 Debug: USER = '$USER'"
+          echo "🔍 Debug: HOME = '$HOME'"
+          
+          # Set repository path with multiple fallbacks
+          if [ -n "$VPS_PEROSITORY_PATH" ]; then
+            REPO_PATH="$VPS_PEROSITORY_PATH"
+          elif [ -d "/home/$USER/Tribute" ]; then
+            REPO_PATH="/home/$USER/Tribute"
+          elif [ -d "/home/$USER/tribute" ]; then
+            REPO_PATH="/home/$USER/tribute"
+          elif [ -d "/root/Tribute" ]; then
+            REPO_PATH="/root/Tribute"
+          else
+            echo "❌ No repository found in common locations"
+            echo "Available directories in /home/$USER/:"
+            ls -la /home/$USER/ 2>/dev/null || echo "Cannot access /home/$USER/"
+            echo "Available directories in /root/:"
+            ls -la /root/ 2>/dev/null || echo "Cannot access /root/"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
+          fi
+          
           echo "Using repository path: $REPO_PATH"
           
           # Navigate to repository directory
