@@ -13,17 +13,7 @@ module.exports = (env, argv) => {
       publicPath: '/'
     },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-        '@/components': path.resolve(__dirname, 'src/components'),
-        '@/pages': path.resolve(__dirname, 'src/pages'),
-        '@/hooks': path.resolve(__dirname, 'src/hooks'),
-        '@/utils': path.resolve(__dirname, 'src/utils'),
-        '@/types': path.resolve(__dirname, 'src/types'),
-        '@/services': path.resolve(__dirname, 'src/services'),
-        '@/store': path.resolve(__dirname, 'src/store')
-      }
+      extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
     module: {
       rules: [
@@ -57,7 +47,7 @@ module.exports = (env, argv) => {
         directory: path.join(__dirname, 'public')
       },
       compress: true,
-      port: 3000,
+      port: 3001,
       hot: true,
       historyApiFallback: true,
       open: true

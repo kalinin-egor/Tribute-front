@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTelegram } from '@/hooks/useTelegram';
+import { useTelegram } from '../hooks/useTelegram';
 
 const HomePage: React.FC = () => {
   const { webApp, user, isReady } = useTelegram();
