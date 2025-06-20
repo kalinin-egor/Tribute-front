@@ -64,12 +64,6 @@ interface TelegramWebApp {
   headerColor: string;
   backgroundColor: string;
   isClosingConfirmationEnabled: boolean;
-  BackButton: {
-    isVisible: boolean;
-    onClick: (callback: () => void) => void;
-    show: () => void;
-    hide: () => void;
-  };
   HapticFeedback: {
     impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
     notificationOccurred: (type: 'error' | 'success' | 'warning') => void;
