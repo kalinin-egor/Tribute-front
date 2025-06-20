@@ -22,6 +22,7 @@ interface TelegramWebApp {
     isProgressVisible: boolean;
     setText: (text: string) => void;
     onClick: (callback: () => void) => void;
+    offClick: (callback: () => void) => void;
     show: () => void;
     hide: () => void;
     enable: () => void;
