@@ -2,55 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { useTelegram } from '../hooks/useTelegram';
 import FeatureItem from '../components/FeatureItem';
 import moneyDuckImage from '../assets/images/money-duck.png';
-
-// Icons from react-icons
 import { FaHeart, FaStar, FaBox, FaTruck, FaBroadcastTower, FaUsers, FaUser, FaChartBar } from 'react-icons/fa';
+import { isTelegramWebApp } from '../utils/helpers';
 
-const features = [
+interface Feature {
+  icon: React.ComponentType<{ className?: string }>;
+  iconBgColor: string;
+  title: string;
+  description: string;
+}
+
+const features: Feature[] = [
   {
-    icon: <FaHeart className="w-6 h-6 text-white" />,
+    icon: FaHeart as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-red-500',
     title: 'Донаты',
     description: 'Подключите разные типы донатов: разовые или регулярные.',
   },
   {
-    icon: <FaStar className="w-6 h-6 text-white" />,
+    icon: FaStar as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-blue-500',
     title: 'Подписки',
     description: 'Настройте разные уровни подписки на уникальный контент.',
   },
   {
-    icon: <FaBox className="w-6 h-6 text-white" />,
+    icon: FaBox as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-purple-500',
     title: 'Цифровые товары',
     description: 'Создайте цифровые товары, чтобы продавать отдельные виды контента.',
   },
   {
-    icon: <FaTruck className="w-6 h-6 text-white" />,
+    icon: FaTruck as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-teal-500',
     title: 'Физические товары',
     description: 'Создайте простой онлайн-магазин для своего комьюнити.',
   },
   {
-    icon: <FaBroadcastTower className="w-6 h-6 text-white" />,
+    icon: FaBroadcastTower as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-pink-500',
     title: 'Частные каналы',
     description: 'Принимайте платежи и предоставляйте доступ к контенту с помощью бота.',
   },
   {
-    icon: <FaUsers className="w-6 h-6 text-white" />,
+    icon: FaUsers as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-blue-400',
     title: 'Частные группы',
     description: 'Монетизируйте ваши группы и разрешите боту управлять доступом.',
   },
   {
-    icon: <FaUser className="w-6 h-6 text-white" />,
+    icon: FaUser as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-red-400',
     title: 'Профиль автора',
     description: 'Настройте монетизацию и выплаты в удобном разделе.',
   },
   {
-    icon: <FaChartBar className="w-6 h-6 text-white" />,
+    icon: FaChartBar as React.ComponentType<{ className?: string }>,
     iconBgColor: 'bg-indigo-500',
     title: 'Подробная статистика',
     description: 'Следите за вашей статистикой: доходами и активностью подписчиков.',
@@ -61,23 +67,27 @@ const MonetizationPage: React.FC = () => {
   const { webApp } = useTelegram();
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  const handleMonetizeClick = () => {
+    if (webApp) {
+      webApp.HapticFeedback.notificationOccurred('success');
+      webApp.close();
+    } else {
+      // Fallback for browser environment
+      alert('Monetization successful!');
+      console.log('Monetization logic triggered in browser.');
+    }
+  };
+
   useEffect(() => {
     if (!webApp) return;
 
-    const handleMainButtonClick = () => {
-      // Handle monetization logic here
-      webApp.HapticFeedback.notificationOccurred('success');
-      webApp.close();
-    };
-    
     webApp.MainButton.setText('Монетизироваться');
     webApp.MainButton.color = '#30a4fc';
-    webApp.MainButton.onClick(handleMainButtonClick);
+    webApp.MainButton.onClick(handleMonetizeClick);
     webApp.MainButton.show();
-    
-    // Cleanup on component unmount
+
     return () => {
-      webApp.MainButton.offClick(handleMainButtonClick);
+      webApp.MainButton.offClick(handleMonetizeClick);
       webApp.MainButton.hide();
     };
   }, [webApp]);
@@ -113,7 +123,7 @@ const MonetizationPage: React.FC = () => {
           {features.map((feature, index) => (
             <FeatureItem
               key={index}
-              icon={feature.icon}
+              IconComponent={feature.icon}
               iconBgColor={feature.iconBgColor}
               title={feature.title}
               description={feature.description}
@@ -134,6 +144,25 @@ const MonetizationPage: React.FC = () => {
           </label>
         </div>
       </div>
+      
+      {/* Fallback button for non-Telegram environments */}
+      {!isTelegramWebApp() && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
+           <div className="max-w-xl mx-auto">
+              <button
+                onClick={handleMonetizeClick}
+                disabled={!termsAccepted}
+                className={`w-full py-3 px-4 font-semibold rounded-lg transition-colors duration-200 ${
+                  termsAccepted 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Монетизироваться
+              </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 };
