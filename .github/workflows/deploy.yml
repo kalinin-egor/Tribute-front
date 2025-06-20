@@ -3,12 +3,8 @@ name: Frontend CI/CD Pipeline
 on:
   push:
     branches: [ main, develop ]
-    paths:
-      - 'Tribute-front/**'
   pull_request:
     branches: [ main, develop ]
-    paths:
-      - 'Tribute-front/**'
 
 jobs:
   build-and-deploy:
@@ -23,22 +19,18 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: Tribute-front/package-lock.json
+        cache-dependency-path: package-lock.json
         
     - name: Install dependencies
-      working-directory: ./Tribute-front
       run: npm ci
       
     - name: Type check
-      working-directory: ./Tribute-front
       run: npm run type-check
       
     - name: Build application
-      working-directory: ./Tribute-front
       run: npm run build
       
     - name: Build verification
-      working-directory: ./Tribute-front
       run: |
         if [ -d "dist" ]; then
           echo "✅ Build successful! Dist directory created."
