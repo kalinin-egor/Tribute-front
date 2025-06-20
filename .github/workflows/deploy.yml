@@ -1,0 +1,66 @@
+name: Frontend CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Tribute-front/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Tribute-front/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Tribute-front/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./Tribute-front
+      run: npm ci
+      
+    - name: Type check
+      working-directory: ./Tribute-front
+      run: npm run type-check
+      
+    - name: Build application
+      working-directory: ./Tribute-front
+      run: npm run build
+      
+    - name: Build verification
+      working-directory: ./Tribute-front
+      run: |
+        if [ -d "dist" ]; then
+          echo "✅ Build successful! Dist directory created."
+          echo "📁 Build contents:"
+          ls -la dist/
+        else
+          echo "❌ Build failed! Dist directory not found."
+          exit 1
+        fi
+      
+    - name: Deploy to VPS
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.GIT_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          set -e
+          echo "Starting deployment process..."
+          cd ${{ secrets.VPS_PEROSITORY_PATH }}
+          git pull origin main
+          cd Tribute-front
+          ./deploy.sh
+          echo "Frontend deployment completed successfully!" 
