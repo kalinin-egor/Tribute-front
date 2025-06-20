@@ -54,12 +54,37 @@ jobs:
           echo "Starting deployment process..."
           echo "Current directory: $(pwd)"
           echo "User: $(whoami)"
-          cd ${{ secrets.VPS_PEROSITORY_PATH }}
-          echo "Repository directory: $(pwd)"
+          
+          # Set repository path with fallback
+          REPO_PATH="${VPS_PEROSITORY_PATH:-/home/$USER/Tribute}"
+          echo "Using repository path: $REPO_PATH"
+          
+          # Navigate to repository directory
+          if [ -d "$REPO_PATH" ]; then
+            cd "$REPO_PATH"
+            echo "Repository directory: $(pwd)"
+          else
+            echo "❌ Repository directory not found: $REPO_PATH"
+            echo "Available directories:"
+            ls -la /home/$USER/
+            exit 1
+          fi
+          
+          # Pull latest changes
+          echo "📥 Pulling latest changes..."
           git pull origin main
-          cd Tribute-front
-          echo "Frontend directory: $(pwd)"
-          ls -la
+          
+          # Navigate to frontend directory
+          if [ -d "Tribute-front" ]; then
+            cd Tribute-front
+            echo "Frontend directory: $(pwd)"
+            ls -la
+          else
+            echo "❌ Tribute-front directory not found!"
+            echo "Available directories:"
+            ls -la
+            exit 1
+          fi
           
           echo "📦 Installing dependencies..."
           npm ci
