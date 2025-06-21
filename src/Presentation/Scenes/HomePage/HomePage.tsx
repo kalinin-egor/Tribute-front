@@ -63,7 +63,7 @@ const HomePage: React.FC<HomePageProps> = () => {
         </svg>
       ),
       onClick: () => {
-        // TODO: Implement new tribute functionality
+        navigate('/monetization'),
         console.log('New tribute clicked');
       },
       iconColor: 'green',
