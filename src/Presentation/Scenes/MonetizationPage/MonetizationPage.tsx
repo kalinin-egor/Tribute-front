@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTelegram } from '../../hooks/useTelegram';
 import FeatureItem from '../../Components/FeatureItem';
 import moneyDuckImage from '../../../assets/images/money-duck.png';
@@ -10,7 +10,6 @@ import { MonetizationPageProps, Feature, MonetizationPageState, MonetizationPage
 const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   const { webApp } = useTelegram();
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const termsRef = useRef<HTMLDivElement>(null);
 
   const features: Feature[] = [
     {
@@ -63,32 +62,15 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
     },
   ];
 
-  const scrollToTerms = () => {
-    if (termsRef.current) {
-      termsRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-      });
-    }
-  };
-
   const handlers: MonetizationPageHandlers = {
     handleMonetizeClick: () => {
-      if (termsAccepted) {
-        if (webApp) {
-          webApp.HapticFeedback.notificationOccurred('success');
-          webApp.close();
-        } else {
-          // Fallback for browser environment
-          alert('Monetization successful!');
-          console.log('Monetization logic triggered in browser.');
-        }
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('success');
+        webApp.close();
       } else {
-        // Scroll to terms when button is clicked while inactive
-        scrollToTerms();
-        if (webApp) {
-          webApp.HapticFeedback.notificationOccurred('warning');
-        }
+        // Fallback for browser environment
+        alert('Monetization successful!');
+        console.log('Monetization logic triggered in browser.');
       }
     },
     handleTermsChange: (accepted: boolean) => {
@@ -108,7 +90,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
       webApp.MainButton.offClick(handlers.handleMonetizeClick);
       webApp.MainButton.hide();
     };
-  }, [webApp, termsAccepted]);
+  }, [webApp]);
 
   useEffect(() => {
     if (!webApp) return;
@@ -148,7 +130,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
           ))}
         </div>
 
-        <div ref={termsRef} className={styles.termsContainer}>
+        <div className={styles.termsContainer}>
           <input 
             type="checkbox"
             id="terms"
@@ -168,6 +150,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
            <div className={styles.fallbackButtonContent}>
               <button
                 onClick={handlers.handleMonetizeClick}
+                disabled={!termsAccepted}
                 className={`${styles.fallbackButtonElement} ${
                   termsAccepted 
                     ? styles.fallbackButtonElementEnabled
