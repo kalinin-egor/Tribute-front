@@ -1,0 +1,11 @@
+.navContainer {
+  @apply grid grid-cols-3 gap-2 mb-4;
+}
+
+.navButton {
+  @apply bg-white border border-gray-200 rounded-lg p-3 text-center text-sm cursor-pointer hover:bg-gray-100;
+}
+
+.icon {
+  @apply text-2xl mb-1;
+} 

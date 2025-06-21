@@ -1,0 +1,15 @@
+.placeholder {
+  @apply text-center py-10 px-5;
+}
+
+.image {
+  @apply max-w-[100px] mb-4 mx-auto;
+}
+
+.title {
+  @apply text-lg font-bold mb-2;
+}
+
+.subtitle {
+  @apply text-gray-500 max-w-[250px] mx-auto;
+} 

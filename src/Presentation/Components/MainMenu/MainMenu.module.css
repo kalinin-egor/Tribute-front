@@ -1,0 +1,28 @@
+.menu {
+  @apply bg-white rounded-lg mb-4 overflow-hidden;
+}
+
+.menuItem {
+  @apply flex items-center py-3 px-4 cursor-pointer border-b border-gray-100;
+}
+
+.menuItem:last-child {
+  @apply border-b-0;
+}
+
+.icon {
+  @apply text-2xl mr-4 w-[30px] text-center;
+}
+
+.title {
+  @apply flex-grow font-medium;
+}
+
+.newBadge {
+  background-color: #007aff; /* Custom blue */
+  @apply text-white rounded py-0.5 px-1.5 text-xs ml-2;
+}
+
+.arrow {
+  @apply text-xl text-gray-300;
+} 

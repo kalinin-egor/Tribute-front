@@ -1,0 +1,21 @@
+.quickActions {
+  @apply grid grid-cols-4 gap-2 mb-4;
+}
+
+.actionCard {
+  @apply rounded-lg p-3 text-left text-sm min-h-[90px] flex flex-col justify-between;
+}
+
+.actionCard p {
+  @apply m-0 mt-2;
+}
+
+.icon {
+  @apply text-2xl;
+}
+
+/* Specific background colors from screenshot - Tailwind doesn't have these by default */
+.actionCard:nth-child(1) { background-color: #a97fff; @apply text-white; }
+.actionCard:nth-child(2) { background-color: #5ac8fa; @apply text-white; }
+.actionCard:nth-child(3) { background-color: #ffcc00; @apply text-black; }
+.actionCard:nth-child(4) { background-color: #78cbf2; @apply text-white; } 

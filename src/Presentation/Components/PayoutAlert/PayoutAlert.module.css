@@ -1,0 +1,24 @@
+.alert {
+  @apply bg-white rounded-lg p-4 mb-4 flex items-center cursor-pointer;
+}
+
+.icon {
+  @apply text-2xl mr-3;
+}
+
+.textContainer {
+  @apply flex-grow;
+}
+
+.title {
+  @apply font-bold;
+  color: #ff9500; /* Custom color */
+}
+
+.subtitle {
+  @apply text-sm text-gray-500;
+}
+
+.arrow {
+  @apply text-xl text-gray-300;
+} 

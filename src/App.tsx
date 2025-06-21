@@ -4,6 +4,7 @@ import { TelegramProvider } from './Presentation/hooks/useTelegram';
 import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
+import CreatorDashboardPage from './Presentation/Scenes/CreatorDashboardPage/CreatorDashboardPage';
 import Layout from './Presentation/Components/Layout';
 
 declare global {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/monetization" element={<MonetizationPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/dashboard" element={<CreatorDashboardPage />} />
           </Routes>
         </Layout>
       </Router>

@@ -1,0 +1,20 @@
+.card {
+  @apply bg-white rounded-lg p-4 mb-4;
+}
+
+.header {
+  @apply flex justify-between items-center mb-2;
+}
+
+.title {
+  @apply font-bold;
+}
+
+.energy {
+  @apply font-bold;
+  color: #ff9500; /* Custom color */
+}
+
+.earnings {
+  @apply text-4xl font-bold;
+} 
