@@ -1,7 +1,7 @@
 /* MonetizationPage.module.css */
 
 .container {
-  @apply bg-white min-h-screen text-gray-900;
+  @apply bg-white dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100;
 }
 
 .content {
@@ -21,7 +21,7 @@
 }
 
 .subtitle {
-  @apply text-gray-600 max-w-md mx-auto text-sm sm:text-base;
+  @apply text-gray-600 dark:text-gray-400 max-w-md mx-auto text-sm sm:text-base;
 }
 
 .featuresContainer {
@@ -33,19 +33,19 @@
 }
 
 .termsCheckbox {
-  @apply h-6 w-6 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500;
+  @apply h-6 w-6 rounded-md border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700;
 }
 
 .termsLabel {
-  @apply text-gray-700 text-sm sm:text-base;
+  @apply text-gray-700 dark:text-gray-300 text-sm sm:text-base;
 }
 
 .termsLink {
-  @apply text-blue-600 hover:underline;
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
 }
 
 .fallbackButton {
-  @apply fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200;
+  @apply fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700;
 }
 
 .fallbackButtonContent {
@@ -57,9 +57,9 @@
 }
 
 .fallbackButtonElementEnabled {
-  @apply bg-blue-500 text-white;
+  @apply bg-blue-500 dark:bg-blue-600 text-white;
 }
 
 .fallbackButtonElementDisabled {
-  @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+  @apply bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed;
 } 
