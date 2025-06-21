@@ -81,10 +81,10 @@ jobs:
           
           # Set repository path based on branch
           if [ "${{ env.BRANCH_NAME }}" = "main" ]; then
-            REPO_PATH="/root/Tribute"
+            REPO_PATH="/root/tribute"
             DEPLOY_USER="root"
           else
-            REPO_PATH="/root/Tribute"
+            REPO_PATH="/root/tribute"
             DEPLOY_USER="root"
           fi
           
@@ -102,7 +102,7 @@ jobs:
             mkdir -p "$REPO_PATH"
             cd "$REPO_PATH"
             # Use SSH for git clone
-            git clone git@github.com:${{ github.repository_owner }}/Tribute.git .
+            git clone git@github.com:${{ github.repository_owner }}/Tribute-front.git .
           fi
           
           # Pull latest changes
@@ -110,17 +110,9 @@ jobs:
           git fetch origin
           git reset --hard origin/${{ env.BRANCH_NAME }}
           
-          # Navigate to frontend directory
-          if [ -d "Tribute-front" ]; then
-            cd Tribute-front
-            echo "Frontend directory: $(pwd)"
-            ls -la
-          else
-            echo "❌ Tribute-front directory not found!"
-            echo "Available directories:"
-            ls -la
-            exit 1
-          fi
+          # We're already in the frontend directory since we cloned Tribute-front
+          echo "Frontend directory: $(pwd)"
+          ls -la
           
           echo "📦 Installing dependencies..."
           npm ci
