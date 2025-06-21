@@ -1,0 +1,148 @@
+/* ProfilePage.module.css */
+
+.container {
+  @apply space-y-6;
+}
+
+.animateFadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  @apply text-center;
+}
+
+.title {
+  @apply text-2xl font-bold text-primary-600 mb-2;
+}
+
+.userProfile {
+  @apply card;
+}
+
+.userInfo {
+  @apply flex items-center space-x-4 mb-4;
+}
+
+.userAvatar {
+  @apply w-16 h-16 rounded-full;
+}
+
+.userAvatarPlaceholder {
+  @apply w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center;
+}
+
+.userAvatarInitial {
+  @apply text-2xl font-bold text-primary-600;
+}
+
+.userDetails h2 {
+  @apply font-semibold text-xl;
+}
+
+.userDetails p {
+  @apply text-gray-600;
+}
+
+.userDetails .language {
+  @apply text-sm text-gray-500;
+}
+
+.profileStats {
+  @apply card;
+}
+
+.profileStats h3 {
+  @apply font-semibold text-lg mb-4;
+}
+
+.statsList {
+  @apply space-y-3;
+}
+
+.statItem {
+  @apply flex justify-between items-center;
+}
+
+.statLabel {
+  @apply text-gray-600;
+}
+
+.statValue {
+  @apply font-semibold;
+}
+
+.statValueGreen {
+  @apply text-green-600;
+}
+
+.statValuePurple {
+  @apply text-purple-600;
+}
+
+.settings {
+  @apply card;
+}
+
+.settings h3 {
+  @apply font-semibold text-lg mb-4;
+}
+
+.settingsList {
+  @apply space-y-3;
+}
+
+.settingButton {
+  @apply w-full text-left py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors duration-200;
+}
+
+.settingContent {
+  @apply flex items-center justify-between;
+}
+
+.settingLeft {
+  @apply flex items-center space-x-3;
+}
+
+.settingIcon {
+  @apply w-5 h-5 text-gray-600;
+}
+
+.settingText {
+  @apply text-gray-700;
+}
+
+.settingArrow {
+  @apply w-4 h-4 text-gray-400;
+}
+
+.about {
+  @apply text-center text-sm text-gray-500;
+}
+
+.loadingContainer {
+  @apply flex items-center justify-center min-h-screen;
+}
+
+.loadingContent {
+  @apply text-center;
+}
+
+.spinner {
+  @apply animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4;
+}
+
+.loadingText {
+  @apply text-gray-600;
+} 

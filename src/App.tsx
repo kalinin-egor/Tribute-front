@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { TelegramProvider } from './hooks/useTelegram';
-import MonetizationPage from './pages/MonetizationPage';
-import ProfilePage from './pages/ProfilePage';
-import Layout from './components/Layout';
+import { TelegramProvider } from './Presentation/hooks/useTelegram';
+import HomePage from './Presentation/Scenes/HomePage/HomePage';
+import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
+import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
+import Layout from './Presentation/Components/Layout';
 
 declare global {
   interface Window {
@@ -30,7 +31,8 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<MonetizationPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/monetization" element={<MonetizationPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </Layout>

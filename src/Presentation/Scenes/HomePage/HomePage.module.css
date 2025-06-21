@@ -1,0 +1,140 @@
+/* HomePage.module.css */
+
+.container {
+  @apply space-y-6;
+}
+
+.animateFadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  @apply text-center;
+}
+
+.title {
+  @apply text-3xl font-bold text-primary-600 mb-2;
+}
+
+.subtitle {
+  @apply text-gray-600;
+}
+
+.userWelcome {
+  @apply card;
+}
+
+.userInfo {
+  @apply flex items-center space-x-4;
+}
+
+.userAvatar {
+  @apply w-12 h-12 rounded-full;
+}
+
+.userDetails h2 {
+  @apply font-semibold text-lg;
+}
+
+.userDetails p {
+  @apply text-gray-600 text-sm;
+}
+
+.quickActions {
+  @apply space-y-3;
+}
+
+.quickActions h3 {
+  @apply font-semibold text-lg;
+}
+
+.actionsGrid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.actionButton {
+  @apply card hover:shadow-md transition-shadow duration-200 text-left;
+}
+
+.actionIcon {
+  @apply mb-2;
+}
+
+.actionIconPrimary {
+  @apply text-primary-600;
+}
+
+.actionIconGreen {
+  @apply text-green-600;
+}
+
+.actionIcon svg {
+  @apply w-6 h-6;
+}
+
+.actionTitle {
+  @apply font-medium;
+}
+
+.actionDescription {
+  @apply text-sm text-gray-600;
+}
+
+.statsCard {
+  @apply card;
+}
+
+.statsTitle {
+  @apply font-semibold text-lg mb-4;
+}
+
+.statsGrid {
+  @apply grid grid-cols-3 gap-4 text-center;
+}
+
+.statValue {
+  @apply text-2xl font-bold;
+}
+
+.statValuePrimary {
+  @apply text-primary-600;
+}
+
+.statValueGreen {
+  @apply text-green-600;
+}
+
+.statValuePurple {
+  @apply text-purple-600;
+}
+
+.statLabel {
+  @apply text-sm text-gray-600;
+}
+
+.loadingContainer {
+  @apply flex items-center justify-center min-h-screen;
+}
+
+.loadingContent {
+  @apply text-center;
+}
+
+.spinner {
+  @apply animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4;
+}
+
+.loadingText {
+  @apply text-gray-600;
+} 

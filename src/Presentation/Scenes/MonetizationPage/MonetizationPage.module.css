@@ -1,0 +1,65 @@
+/* MonetizationPage.module.css */
+
+.container {
+  @apply bg-white min-h-screen text-gray-900 px-4 sm:px-6 lg:px-8 pt-8 pb-24;
+}
+
+.content {
+  @apply max-w-xl mx-auto;
+}
+
+.header {
+  @apply text-center space-y-4;
+}
+
+.heroImage {
+  @apply mx-auto w-36 h-36 sm:w-40 sm:h-40;
+}
+
+.title {
+  @apply text-2xl sm:text-3xl font-bold;
+}
+
+.subtitle {
+  @apply text-gray-600 max-w-md mx-auto text-sm sm:text-base;
+}
+
+.featuresContainer {
+  @apply mt-8 space-y-6;
+}
+
+.termsContainer {
+  @apply mt-8 flex items-center space-x-3;
+}
+
+.termsCheckbox {
+  @apply h-6 w-6 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500;
+}
+
+.termsLabel {
+  @apply text-gray-700 text-sm sm:text-base;
+}
+
+.termsLink {
+  @apply text-blue-600 hover:underline;
+}
+
+.fallbackButton {
+  @apply fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200;
+}
+
+.fallbackButtonContent {
+  @apply max-w-xl mx-auto;
+}
+
+.fallbackButtonElement {
+  @apply w-full py-3 px-4 font-semibold rounded-lg transition-colors duration-200;
+}
+
+.fallbackButtonElementEnabled {
+  @apply bg-blue-500 text-white;
+}
+
+.fallbackButtonElementDisabled {
+  @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+} 
