@@ -90,4 +90,33 @@ export const getTelegramThemeColor = (): string => {
     return window.Telegram.WebApp.themeParams.button_color || '#0088cc';
   }
   return '#0088cc';
+};
+
+// Dark mode utilities
+export const isDarkMode = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return document.documentElement.classList.contains('dark');
+};
+
+export const setDarkMode = (enabled: boolean): void => {
+  if (typeof window === 'undefined') return;
+  
+  if (enabled) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+};
+
+export const toggleDarkMode = (): void => {
+  if (typeof window === 'undefined') return;
+  
+  const isDark = isDarkMode();
+  setDarkMode(!isDark);
+};
+
+// Get system preference for dark mode
+export const getSystemDarkModePreference = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }; 

@@ -14,8 +14,8 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ IconComponent, iconBgColor, t
         <IconComponent className="w-6 h-6 text-white" />
       </div>
       <div>
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
+        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
       </div>
     </div>
   );
