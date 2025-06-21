@@ -165,17 +165,3 @@ jobs:
         command_timeout: 10m
         proxy_port: 22
         proxy_timeout: 30s
-
-    - name: Notify Telegram (success)
-      if: success()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_BOT_TOKEN }}/sendMessage" \
-          -d chat_id="${{ secrets.TG_CHAT_ID }}" \
-          -d text="✅ Frontend (${{ env.BRANCH_NAME }}) успешно задеплоен."
-
-    - name: Notify Telegram (failure)
-      if: failure()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_BOT_TOKEN }}/sendMessage" \
-          -d chat_id="${{ secrets.TG_CHAT_ID }}" \
-          -d text="❌ Ошибка при деплое Frontend (${{ env.BRANCH_NAME }})" 
