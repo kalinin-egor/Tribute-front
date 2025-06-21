@@ -115,7 +115,7 @@ jobs:
           ls -la
           
           echo "📦 Installing dependencies..."
-          npm ci
+          npm ci --no-audit --no-fund
           
           echo "🔨 Building application..."
           npm run build
@@ -136,22 +136,26 @@ jobs:
           pkill -f "node.*dist" || true
           pkill -f "serve.*dist" || true
           
-          # Start the application using serve
-          echo "Installing serve globally..."
-          npm install -g serve
+          # Start the application using serve (install if not present)
+          if ! command -v serve &> /dev/null; then
+            echo "Installing serve globally..."
+            npm install -g serve
+          fi
           
           echo "Starting application with serve..."
           nohup serve -s dist -l 3000 > app.log 2>&1 &
+          SERVE_PID=$!
           
           echo "⏳ Waiting for application to start..."
-          sleep 10
+          sleep 5
           
           # Check if application is running
-          if pgrep -f "serve.*dist" > /dev/null; then
+          if kill -0 $SERVE_PID 2>/dev/null; then
             echo "✅ Application started successfully!"
             echo "📋 Application logs:"
             tail -n 10 app.log
             echo "🌐 Application should be available at: http://${{ secrets.SERVER_IP }}:3000"
+            echo "📝 Process ID: $SERVE_PID"
           else
             echo "❌ Application failed to start!"
             echo "📋 Error logs:"
@@ -162,6 +166,6 @@ jobs:
           echo "Frontend deployment completed successfully!"
         port: 22
         timeout: 30s
-        command_timeout: 10m
+        command_timeout: 15m
         proxy_port: 22
         proxy_timeout: 30s
