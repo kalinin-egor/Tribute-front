@@ -81,10 +81,10 @@ jobs:
           
           # Set repository path based on branch
           if [ "${{ env.BRANCH_NAME }}" = "main" ]; then
-            REPO_PATH="/root/tribute"
+            REPO_PATH="/root/tribute/Tribute-front"
             DEPLOY_USER="root"
           else
-            REPO_PATH="/root/tribute"
+            REPO_PATH="/root/tribute/Tribute-front"
             DEPLOY_USER="root"
           fi
           
