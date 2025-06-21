@@ -1,7 +1,7 @@
 /* MonetizationPage.module.css */
 
 .container {
-  @apply bg-white min-h-screen text-gray-900 px-4 sm:px-6 lg:px-8 pt-8 pb-24;
+  @apply bg-white min-h-screen text-gray-900;
 }
 
 .content {
