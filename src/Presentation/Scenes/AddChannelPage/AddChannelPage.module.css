@@ -1,0 +1,39 @@
+.container {
+    @apply flex flex-col h-screen p-4 text-center bg-white;
+}
+
+.content {
+    @apply flex-grow flex flex-col items-center justify-center;
+}
+
+.duckImage {
+    @apply w-24 h-24 mb-6;
+}
+
+.title {
+    @apply text-2xl font-bold mb-2;
+}
+
+.description {
+    @apply text-gray-600 mb-4;
+}
+
+.code {
+    @apply font-mono bg-gray-100 p-1 rounded;
+}
+
+.link {
+    @apply text-blue-500 hover:underline;
+}
+
+.footer {
+    @apply mt-auto;
+}
+
+.footerText {
+    @apply text-xs text-gray-400 mb-4;
+}
+
+.actionButton {
+    @apply w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-colors;
+} 

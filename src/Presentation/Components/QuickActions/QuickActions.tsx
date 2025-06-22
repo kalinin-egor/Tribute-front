@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChannelDTO } from '../../../Domain/types';
 import styles from './QuickActions.module.css';
 import StoryViewer from '../../Scenes/CreatorDashboardPage/components/StoryViewer/StoryViewer';
@@ -19,7 +20,7 @@ const getSlides = (folder: string, count: number) => {
 };
 
 const initialActions = [
-    { id: 'add-a-manager-to-your-channel', title: 'Add a manager to your channel', icon: images('./add-a-manager-to-your-channel/1.png'), watched: false, color: '#a97fff', slides: getSlides('add-a-manager-to-your-channel', 7) },
+    { id: 'channels-and-groups', title: 'Channels and Groups', icon: '👥', watched: false, color: '#a97fff', slides: [] },
     { id: 'physical-products-guide', title: 'Physical products guide', icon: images('./physical-products-guide/1.png'), watched: false, color: '#5ac8fa', slides: getSlides('physical-products-guide', 5) },
     { id: 'how-to-create-a-referal-offer', title: 'How to create a referral offer', icon: images('./how-to-create-a-referal-offer/1.png'), watched: true, color: '#ffcc00', slides: getSlides('how-to-create-a-referal-offer', 7) },
     { id: 'how-to-create-a-fundraising-goal', title: 'How to create a fundraising goal', icon: images('./how-to-create-a-fundraising-goal/1.png'), watched: false, color: '#78cbf2', slides: getSlides('how-to-create-a-fundraising-goal', 5) },
@@ -37,8 +38,14 @@ interface QuickActionsProps {
 const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, onRefresh }) => {
   const [actions, setActions] = useState(initialActions);
   const [activeStory, setActiveStory] = useState<any | null>(null);
+  const navigate = useNavigate();
 
   const handleActionClick = (action: any) => {
+    if (action.id === 'channels-and-groups') {
+      navigate('/channels');
+      return;
+    }
+    
     if (action.slides.length > 0) {
       setActiveStory(action);
     }
@@ -64,7 +71,10 @@ const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, o
             style={{ backgroundColor: action.color }}
             onClick={() => handleActionClick(action)}
           >
-            <img src={action.icon} alt="" className={styles.icon} />
+            {action.id === 'channels-and-groups' ? 
+              <div className={styles.channelsIcon}>{action.icon}</div> :
+              <img src={action.icon} alt="" className={styles.icon} />
+            }
             <p>{action.title}</p>
           </div>
         ))}

@@ -32,7 +32,11 @@
 }
 
 .icon {
-  @apply w-8 h-8 object-cover rounded-md;
+  @apply object-cover w-full h-full;
+}
+
+.channelsIcon {
+  @apply text-4xl flex items-center justify-center w-full h-full;
 }
 
 /* Specific background colors from screenshot - Tailwind doesn't have these by default */
