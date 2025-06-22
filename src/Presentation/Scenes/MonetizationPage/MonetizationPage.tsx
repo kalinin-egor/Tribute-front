@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useTelegram } from '../../hooks/useTelegram';
 import { useAppState } from '../../hooks/useAppState';
 import FeatureItem from '../../Components/FeatureItem';
+import Spinner from '../../Components/Spinner/Spinner';
 import moneyDuckImage from '../../../assets/images/money-duck.png';
 import { FaHeart, FaStar, FaBox, FaTruck, FaBroadcastTower, FaUsers, FaUser, FaChartBar } from 'react-icons/fa';
-import { FaSpinner } from 'react-icons/fa6';
 import { isTelegramWebApp } from '../../../utils/helpers';
 import styles from './MonetizationPage.module.css';
 import { MonetizationPageProps, Feature, MonetizationPageState, MonetizationPageHandlers } from './MonetizationPage.types';
@@ -109,7 +109,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
       webApp.MainButton.offClick(handlers.handleMonetizeClick);
       webApp.MainButton.hide();
     };
-  }, [webApp, isOnboarding]);
+  }, [webApp, isOnboarding, handlers.handleMonetizeClick]);
 
   useEffect(() => {
     if (!webApp) return;
@@ -179,7 +179,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
               >
                 {isOnboarding ? (
                   <>
-                    <FaSpinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    <Spinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                     Регистрация...
                   </>
                 ) : (
