@@ -31,6 +31,18 @@
     @apply text-xs text-gray-400 mb-4;
 }
 
+.confirmSection {
+    @apply mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200;
+}
+
+.confirmText {
+    @apply text-sm text-blue-800 mb-3;
+}
+
+.confirmButton {
+    @apply bg-blue-500 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors;
+}
+
 /* Styles for List Page */
 .header {
   @apply p-0; /* Reset padding for list view header */
@@ -78,7 +90,7 @@
 }
 
 .actionButton {
-  @apply w-full bg-blue-500 text-white text-center font-bold py-3 rounded-lg hover:bg-blue-600 transition-colors;
+  @apply w-full bg-blue-500 text-white text-center font-bold py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed;
 }
 
 .noChannels {

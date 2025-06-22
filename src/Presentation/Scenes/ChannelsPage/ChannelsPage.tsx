@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppState } from '../../hooks/useAppState';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaChevronRight } from 'react-icons/fa';
@@ -11,42 +11,58 @@ const SearchIcon = FaSearch as React.ComponentType<{ className?: string }>;
 const ChevronIcon = FaChevronRight as React.ComponentType<{ className?: string }>;
 
 const ChannelsPage: React.FC = () => {
-  const { dashboardData } = useAppState();
+  const { dashboardData, refreshDashboard } = useAppState();
   const { webApp } = useTelegram();
   const navigate = useNavigate();
+  const [isAddingBot, setIsAddingBot] = useState(false);
+  const [showConfirmButton, setShowConfirmButton] = useState(false);
+  const [channelUsername, setChannelUsername] = useState('');
 
   const handleSelectChannel = async () => {
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
     const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
     
+    setIsAddingBot(true);
+    setShowConfirmButton(true);
+    
     if (webApp) {
       webApp.openTelegramLink(url);
-      
-      // Note: In a real implementation, you would need to handle the callback
-      // when the bot is actually added to the channel. This could be done through:
-      // 1. Webhook from Telegram
-      // 2. Polling the bot's status
-      // 3. User manually confirming the addition
-      
-      // For now, we'll show a message to the user
-      setTimeout(() => {
-        alert('После добавления бота в канал, вернитесь в приложение для продолжения.');
-      }, 1000);
     } else {
       window.open(url, '_blank');
     }
   };
 
   // Function to add bot to channel (called when user confirms)
-  const addBotToChannel = async (channelUsername: string) => {
+  const addBotToChannel = async () => {
+    if (!channelUsername) {
+      alert('Пожалуйста, введите username канала (например: @my_channel)');
+      return;
+    }
+
     try {
       const response = await tributeApiService.addBot(channelUsername);
       console.log('Bot added to channel:', response);
+      
       // Refresh dashboard data to show the new channel
-      window.location.reload();
+      await refreshDashboard();
+      
+      // Reset states
+      setIsAddingBot(false);
+      setShowConfirmButton(false);
+      setChannelUsername('');
+      
+      alert('Бот успешно добавлен в канал!');
     } catch (error) {
       console.error('Error adding bot to channel:', error);
       alert('Ошибка при добавлении бота в канал. Попробуйте еще раз.');
+    }
+  };
+
+  const handleConfirmClick = () => {
+    const username = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
+    if (username) {
+      setChannelUsername(username);
+      addBotToChannel();
     }
   };
   
@@ -84,10 +100,25 @@ const ChannelsPage: React.FC = () => {
                 <p className={styles.footerText}>
                 The bot won't post or delete anything without your consent.
                 </p>
+                
+                {showConfirmButton && (
+                  <div className={styles.confirmSection}>
+                    <p className={styles.confirmText}>
+                      После добавления бота в канал, нажмите кнопку ниже:
+                    </p>
+                    <button onClick={handleConfirmClick} className={styles.confirmButton}>
+                      Подтвердить добавление бота
+                    </button>
+                  </div>
+                )}
             </div>
             <div className={styles.footer}>
-                <button onClick={handleSelectChannel} className={styles.actionButton}>
-                Select Channel & Add Bot
+                <button 
+                  onClick={handleSelectChannel} 
+                  className={styles.actionButton}
+                  disabled={isAddingBot}
+                >
+                  {isAddingBot ? 'Добавление...' : 'Select Channel & Add Bot'}
                 </button>
             </div>
         </div>
