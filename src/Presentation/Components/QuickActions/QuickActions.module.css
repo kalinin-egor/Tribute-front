@@ -13,12 +13,12 @@
 }
 
 .actionCard {
-  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-sm flex flex-col justify-between relative cursor-pointer;
+  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-xs flex flex-col justify-between relative cursor-pointer;
   border: 2px solid transparent;
 }
 
 .unwatched {
-  border-color: #5ac8fa; /* Blue border for unwatched */
+  border-color: #87D9FF; /* Brighter blue for unwatched */
 }
 
 .watched {
@@ -26,7 +26,7 @@
 }
 
 .actionCard p {
-  @apply m-0 mt-2 text-white font-semibold;
+  @apply m-0 mt-2 text-white font-semibold leading-tight;
 }
 
 .icon {
