@@ -25,7 +25,7 @@ function AppContent() {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
       window.Telegram.WebApp.setHeaderColor('#ffffff');
-      window.Telegram.WebApp.setBackgroundColor('#ffffff');
+      window.Telegram.WebApp.setBackgroundColor('#f2f2f2');
     }
   }, []);
 
