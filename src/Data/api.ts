@@ -134,7 +134,10 @@ class TributeApiService {
   }
 
   // Add Bot
-  async addBot(request: AddBotRequest): Promise<AddBotResponse> {
+  async addBot(channelUsername: string): Promise<AddBotResponse> {
+    const request: AddBotRequest = {
+      'channel-username': channelUsername
+    };
     return this.request<AddBotResponse>('/add-bot', {
       method: 'POST',
       body: JSON.stringify(request),

@@ -106,13 +106,12 @@ export interface CreateUserResponse {
 
 // Add Bot Request/Response
 export interface AddBotRequest {
-  'bot-username': string;
-  access_token: string;
+  'channel-username': string;
 }
 
 export interface AddBotResponse {
-  message: string;
-  channel: ChannelDTO;
+  success: boolean;
+  message?: string;
 }
 
 // Publish Subscription Request/Response

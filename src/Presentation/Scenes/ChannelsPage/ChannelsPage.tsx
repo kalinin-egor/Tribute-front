@@ -3,6 +3,7 @@ import { useAppState } from '../../hooks/useAppState';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaChevronRight } from 'react-icons/fa';
 import { useTelegram } from '../../hooks/useTelegram';
+import tributeApiService from '../../../Data/api';
 import styles from './ChannelsPage.module.css';
 import duckImage from '../../../assets/images/misunderstood-duck.png';
 
@@ -14,13 +15,38 @@ const ChannelsPage: React.FC = () => {
   const { webApp } = useTelegram();
   const navigate = useNavigate();
 
-  const handleSelectChannel = () => {
-    const botUsername = process.env.BOT_USERNAME || 'tribute';
+  const handleSelectChannel = async () => {
+    const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
     const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
+    
     if (webApp) {
       webApp.openTelegramLink(url);
+      
+      // Note: In a real implementation, you would need to handle the callback
+      // when the bot is actually added to the channel. This could be done through:
+      // 1. Webhook from Telegram
+      // 2. Polling the bot's status
+      // 3. User manually confirming the addition
+      
+      // For now, we'll show a message to the user
+      setTimeout(() => {
+        alert('После добавления бота в канал, вернитесь в приложение для продолжения.');
+      }, 1000);
     } else {
       window.open(url, '_blank');
+    }
+  };
+
+  // Function to add bot to channel (called when user confirms)
+  const addBotToChannel = async (channelUsername: string) => {
+    try {
+      const response = await tributeApiService.addBot(channelUsername);
+      console.log('Bot added to channel:', response);
+      // Refresh dashboard data to show the new channel
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding bot to channel:', error);
+      alert('Ошибка при добавлении бота в канал. Попробуйте еще раз.');
     }
   };
   

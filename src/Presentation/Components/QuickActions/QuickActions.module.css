@@ -14,7 +14,7 @@
 }
 
 .actionCard {
-  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-[10px] flex flex-col justify-end relative cursor-pointer;
+  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-[8px] flex flex-col justify-end relative cursor-pointer;
   border: 2px solid transparent;
   box-shadow: inset 0 0 0 1px #f9fafb; /* Inner shadow creates the 1px "gap" */
 }
@@ -28,7 +28,7 @@
 }
 
 .actionCard p {
-  @apply text-xs font-bold z-10 text-white;
+  @apply text-xs font-bold z-10 text-white leading-tight;
 }
 
 .icon {
