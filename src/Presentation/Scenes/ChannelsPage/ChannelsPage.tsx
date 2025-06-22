@@ -15,69 +15,47 @@ const ChannelsPage: React.FC = () => {
   const { webApp } = useTelegram();
   const navigate = useNavigate();
   const [isAddingBot, setIsAddingBot] = useState(false);
-  const [showConfirmButton, setShowConfirmButton] = useState(false);
-  const [channelUsername, setChannelUsername] = useState('');
-
-  // Check if we have channel info from Telegram
-  useEffect(() => {
-    if (webApp && webApp.initDataUnsafe) {
-      const { start_param, chat } = webApp.initDataUnsafe;
-      
-      // If we have start_param with channel info (from bot being added)
-      if (start_param && start_param.startsWith('channel_')) {
-        const channelUsername = start_param.replace('channel_', '');
-        console.log('Channel username from start_param:', channelUsername);
-        setChannelUsername(channelUsername);
-        setShowConfirmButton(true);
-        setIsAddingBot(true);
-      }
-      
-      // If we have chat info (when opened from channel)
-      if (chat && chat.type === 'channel') {
-        const channelUsername = chat.username || chat.title;
-        console.log('Channel info from chat:', channelUsername);
-        if (channelUsername) {
-          setChannelUsername(channelUsername);
-          setShowConfirmButton(true);
-          setIsAddingBot(true);
-        }
-      }
-    }
-  }, [webApp]);
 
   const handleSelectChannel = async () => {
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
-    // Use start parameter to capture channel info when bot is added
-    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages&start=channel_`;
+    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
     
     setIsAddingBot(true);
-    setShowConfirmButton(true);
-    
-    if (webApp) {
-      webApp.openTelegramLink(url);
-    } else {
-      window.open(url, '_blank');
+
+    try {
+      if (webApp) {
+        webApp.openTelegramLink(url);
+      } else {
+        window.open(url, '_blank');
+      }
+      
+      // Даем пользователю время добавить бота, затем запрашиваем username
+      setTimeout(() => {
+        const channelUsername = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
+        
+        if (channelUsername) {
+          // Убираем @ если пользователь его ввел
+          const cleanUsername = channelUsername.startsWith('@') ? channelUsername.slice(1) : channelUsername;
+          addBotToChannel(cleanUsername);
+        } else {
+          setIsAddingBot(false);
+        }
+      }, 3000);
+    } catch (error) {
+      console.error('Error opening bot link:', error);
+      alert('Ошибка при открытии ссылки на бота');
+      setIsAddingBot(false);
     }
   };
 
-  // Function to add bot to channel (called when user confirms)
-  const addBotToChannel = async () => {
-    if (!channelUsername) {
-      alert('Пожалуйста, введите username канала (например: @my_channel)');
-      return;
-    }
-
+  // Function to add bot to channel
+  const addBotToChannel = async (channelUsername: string) => {
     try {
       const response = await tributeApiService.addBot(channelUsername);
       console.log('Bot added to channel:', response);
       
       // Refresh dashboard data to show the new channel
       await refreshDashboard();
-      
-      // Reset states
-      setIsAddingBot(false);
-      setShowConfirmButton(false);
-      setChannelUsername('');
       
       alert('Бот успешно добавлен в канал!');
     } catch (error) {
@@ -86,20 +64,6 @@ const ChannelsPage: React.FC = () => {
     }
   };
 
-  const handleConfirmClick = () => {
-    if (channelUsername) {
-      // If we already have channel username from Telegram, use it
-      addBotToChannel();
-    } else {
-      // Fallback to manual input
-      const username = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
-      if (username) {
-        setChannelUsername(username);
-        addBotToChannel();
-      }
-    }
-  };
-  
   // Show back button on mount and hide on unmount
   useEffect(() => {
     if (webApp) {
@@ -134,25 +98,6 @@ const ChannelsPage: React.FC = () => {
                 <p className={styles.footerText}>
                 The bot won't post or delete anything without your consent.
                 </p>
-                
-                {showConfirmButton && (
-                  <div className={styles.confirmSection}>
-                    <p className={styles.confirmText}>
-                      {channelUsername 
-                        ? `Канал "${channelUsername}" обнаружен. Нажмите кнопку для подтверждения:`
-                        : 'После добавления бота в канал, нажмите кнопку ниже:'
-                      }
-                    </p>
-                    {channelUsername && (
-                      <p className={styles.channelInfo}>
-                        Канал: <span className={styles.channelName}>{channelUsername}</span>
-                      </p>
-                    )}
-                    <button onClick={handleConfirmClick} className={styles.confirmButton}>
-                      {channelUsername ? 'Подтвердить добавление' : 'Подтвердить добавление бота'}
-                    </button>
-                  </div>
-                )}
             </div>
             <div className={styles.footer}>
                 <button 

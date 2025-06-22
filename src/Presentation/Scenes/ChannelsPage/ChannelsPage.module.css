@@ -31,26 +31,6 @@
     @apply text-xs text-gray-400 mb-4;
 }
 
-.confirmSection {
-    @apply mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200;
-}
-
-.confirmText {
-    @apply text-sm text-blue-800 mb-3;
-}
-
-.channelInfo {
-    @apply text-sm text-gray-700 mb-3 p-2 bg-blue-100 rounded;
-}
-
-.channelName {
-    @apply font-semibold text-blue-900;
-}
-
-.confirmButton {
-    @apply bg-blue-500 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors;
-}
-
 /* Styles for List Page */
 .header {
   @apply p-0; /* Reset padding for list view header */
@@ -74,6 +54,14 @@
 
 .channelItem {
   @apply flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50;
+}
+
+.channelInfo {
+  @apply flex flex-col;
+}
+
+.channelName {
+  @apply font-semibold;
 }
 
 .subscriberCount {
