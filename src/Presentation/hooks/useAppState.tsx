@@ -63,8 +63,13 @@ export const useAppState = () => {
         includesNotFound: error.message?.includes('Not Found')
       });
       
-      // Check if it's a NotFoundError (404) - user needs onboarding
-      if (error instanceof NotFoundError || error.message?.includes('404') || error.message?.includes('Not Found')) {
+      // Check if it's a NotFoundError (404) or a related message - user needs onboarding
+      if (
+        error instanceof NotFoundError || 
+        error.message?.includes('404') || 
+        error.message?.toLowerCase().includes('not found') ||
+        error.message?.toLowerCase().includes('onboarding')
+      ) {
         console.log('User not onboarded, redirecting to monetization');
         setState(prev => ({
           ...prev,
