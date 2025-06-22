@@ -80,23 +80,6 @@ const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, o
         ))}
       </div>
       
-      {/* Show channel status */}
-      <div className={styles.channelStatus}>
-        <h3>Your Channels ({channels.length})</h3>
-        {channels.length > 0 ? (
-          <div className={styles.channelsList}>
-            {channels.map((channel, index) => (
-              <div key={index} className={styles.channelItem}>
-                <span>@{channel.channel_username}</span>
-                {isSubPublished && <span className={styles.published}>✓ Published</span>}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.noChannels}>No channels connected yet</p>
-        )}
-      </div>
-      
       {activeStory && <StoryViewer slides={activeStory.slides} onClose={handleCloseViewer} />}
     </>
   );

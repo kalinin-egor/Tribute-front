@@ -28,15 +28,20 @@
 }
 
 .actionCard p {
-  @apply m-0 mt-2 text-white font-semibold leading-tight;
+  @apply text-xs font-bold z-10;
+}
+
+.actionCard::before {
+  content: '';
+  @apply absolute inset-0 bg-black opacity-30;
 }
 
 .icon {
-  @apply object-cover w-full h-full;
+  @apply absolute top-2 right-2 w-8 h-8;
 }
 
 .channelsIcon {
-  @apply text-4xl flex items-center justify-center w-full h-full;
+  @apply absolute top-2 right-2 text-2xl;
 }
 
 /* Specific background colors from screenshot - Tailwind doesn't have these by default */
