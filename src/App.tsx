@@ -18,30 +18,19 @@ declare global {
 }
 
 function AppContent() {
-  const { isLoading, error, isOnboarded, dashboardData } = useAppState();
+  const { isLoading, error, isOnboarded } = useAppState();
 
   useEffect(() => {
-    console.log('AppContent mounted');
-    console.log('App state:', { isLoading, error, isOnboarded, hasDashboardData: !!dashboardData });
-    
     // Initialize Telegram Web App
     if (window.Telegram?.WebApp) {
-      console.log('Initializing Telegram WebApp...');
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
-      // Set the background color to white for the whole app
       window.Telegram.WebApp.setHeaderColor('#ffffff');
       window.Telegram.WebApp.setBackgroundColor('#ffffff');
-      console.log('Telegram WebApp initialized');
-    } else {
-      console.log('Telegram WebApp not available in AppContent');
     }
   }, []);
 
-  console.log('AppContent render:', { isLoading, error, isOnboarded, hasDashboardData: !!dashboardData });
-
   if (isLoading) {
-    console.log('Showing loading screen');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -53,14 +42,13 @@ function AppContent() {
   }
 
   if (error) {
-    console.log('Showing error screen:', error);
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="text-red-500 text-xl mb-4">⚠️</div>
           <p className="text-red-600 mb-4">Error: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Retry
@@ -70,16 +58,22 @@ function AppContent() {
     );
   }
 
-  console.log('Rendering main app content');
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/monetization" element={<MonetizationPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/dashboard" element={<CreatorDashboardPage />} />
+        {isOnboarded ? (
+          <>
+            <Route path="/dashboard" element={<CreatorDashboardPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </>
+        ) : (
+          <>
+            <Route path="/monetization" element={<MonetizationPage />} />
+            <Route path="*" element={<Navigate to="/monetization" replace />} />
+          </>
+        )}
         <Route path="/test" element={<TestPage />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
   );
