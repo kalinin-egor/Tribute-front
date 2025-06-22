@@ -28,13 +28,20 @@ const TestPage: React.FC = () => {
     }
   };
 
-  const testOnboard = async () => {
+  const handleCreateUser = async () => {
     try {
-      setTestResult('Testing onboard...');
-      const result = await tributeApiService.onboard();
-      setTestResult(`Onboard successful: ${JSON.stringify(result, null, 2)}`);
-    } catch (error: any) {
-      setTestResult(`Onboard failed: ${error.message}`);
+      const response = await tributeApiService.createUser();
+      setTestResult(JSON.stringify(response, null, 2));
+    } catch (err: any) {
+      setTestResult(err.message);
+    }
+  };
+
+  const handlePublishSubscription = async () => {
+    try {
+      // ... existing code ...
+    } catch (err: any) {
+      // ... existing code ...
     }
   };
 
@@ -87,10 +94,16 @@ const TestPage: React.FC = () => {
             Test Dashboard
           </button>
           <button 
-            onClick={testOnboard}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+            onClick={handleCreateUser}
+            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mr-2"
           >
-            Test Onboard
+            Create User
+          </button>
+          <button 
+            onClick={handlePublishSubscription}
+            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mr-2"
+          >
+            Publish Subscription
           </button>
         </div>
       </div>

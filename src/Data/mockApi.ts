@@ -10,7 +10,9 @@ import {
   UploadVerifiedPassportRequest,
   MessageResponse,
   StatusResponse,
-  TelegramUpdate
+  TelegramUpdate,
+  ErrorResponse,
+  CreateUserResponse,
 } from '../Domain/types';
 
 class MockApiService {
@@ -61,23 +63,29 @@ class MockApiService {
     */
   }
 
-  // Onboard
-  async onboard(): Promise<OnboardResponse> {
-    await this.delay(1000);
-    return {
-      message: 'User onboarded successfully',
-      user: {
-        id: 123456789,
-        earned: 0,
-        is_onboarded: true,
-        is_sub_published: false,
-        is_verified: false
-      }
-    };
+  // Create User
+  async createUser(): Promise<CreateUserResponse> {
+    console.log('Mocking createUser call');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          message: "User processed successfully",
+          user: {
+            id: 123,
+            earned: 0,
+            is_onboarded: true,
+            is_sub_published: false,
+            is_verified: false
+          },
+          created: true
+        });
+      }, 500);
+    });
   }
 
   // Add Bot
   async addBot(request: AddBotRequest): Promise<AddBotResponse> {
+    console.log('Mocking addBot call with', request);
     await this.delay(1000);
     return {
       message: 'Bot added successfully',
