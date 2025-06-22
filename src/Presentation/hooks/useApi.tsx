@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import tributeApiService from '../../Data/api';
 import { 
-  AddBotRequest, 
   PublishSubscriptionRequest, 
   CreateSubscribeRequest, 
   SetUpPayoutsRequest, 
@@ -19,8 +18,8 @@ export const useApi = () => {
     return await tributeApiService.getDashboard();
   }, []);
 
-  const addBot = useCallback(async (request: AddBotRequest) => {
-    return await tributeApiService.addBot(request);
+  const addBot = useCallback(async (channelUsername: string) => {
+    return await tributeApiService.addBot(channelUsername);
   }, []);
 
   const publishSubscription = useCallback(async (request: PublishSubscriptionRequest) => {
