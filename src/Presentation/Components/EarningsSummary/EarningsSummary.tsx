@@ -6,7 +6,7 @@ const EarningsSummary: React.FC = () => {
     <div className={styles.card}>
       <div className={styles.header}>
         <span className={styles.title}>Your Earnings</span>
-        <span className={styles.energy}>⚡️ Energy</span>
+        {/* <span className={styles.energy}>⚡️ Energy</span> */}
       </div>
       <div className={styles.earnings}>
         €0
