@@ -6,7 +6,6 @@ import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
 import CreatorDashboardPage from './Presentation/Scenes/CreatorDashboardPage/CreatorDashboardPage';
-import TestPage from './Presentation/Scenes/TestPage/TestPage';
 import Layout from './Presentation/Components/Layout';
 
 declare global {
@@ -73,7 +72,6 @@ function AppContent() {
             <Route path="*" element={<Navigate to="/monetization" replace />} />
           </>
         )}
-        <Route path="/test" element={<TestPage />} />
       </Routes>
     </Layout>
   );
