@@ -78,6 +78,11 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     }
   }, [isReady]);
 
+  const refreshDashboard = useCallback(async () => {
+    hasCheckedRef.current = false;
+    await checkDashboard();
+  }, [checkDashboard]);
+
   const onboardUser = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -94,11 +99,6 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
       }));
     }
   }, [refreshDashboard]);
-
-  const refreshDashboard = useCallback(async () => {
-    hasCheckedRef.current = false;
-    await checkDashboard();
-  }, [checkDashboard]);
 
   useEffect(() => {
     if (isReady) {
