@@ -1,8 +1,11 @@
 import React from 'react';
 import { useAppState } from '../../hooks/useAppState';
 import { Link } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaChevronRight } from 'react-icons/fa';
 import styles from './ChannelsPage.module.css';
+
+const SearchIcon = FaSearch as React.ComponentType<{ className?: string }>;
+const ChevronIcon = FaChevronRight as React.ComponentType<{ className?: string }>;
 
 const ChannelsPage: React.FC = () => {
   const { dashboardData } = useAppState();
@@ -12,7 +15,7 @@ const ChannelsPage: React.FC = () => {
       <div className={styles.header}>
         <h1 className={styles.title}>Channels and Groups</h1>
         <div className={styles.searchContainer}>
-          <FaSearch className={styles.searchIcon} />
+          <SearchIcon className={styles.searchIcon} />
           <input type="text" placeholder="Search" className={styles.searchInput} />
         </div>
       </div>
@@ -25,7 +28,7 @@ const ChannelsPage: React.FC = () => {
                 <span className={styles.channelName}>{channel.channel_username}</span>
                 <span className={styles.subscriberCount}>0 paid subscribers</span>
               </div>
-              <span className={styles.arrow}>›</span>
+              <ChevronIcon className={styles.arrow} />
             </li>
           ))}
         </ul>

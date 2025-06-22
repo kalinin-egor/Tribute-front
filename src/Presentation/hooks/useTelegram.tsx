@@ -38,6 +38,7 @@ interface TelegramWebApp {
     hide: () => void;
   };
   initData: string;
+  openTelegramLink: (url: string) => void;
   initDataUnsafe: {
     query_id?: string;
     user?: TelegramUser;
@@ -168,6 +169,7 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
             hide: () => {},
           },
           initData: 'mock-init-data-for-development',
+          openTelegramLink: (url: string) => { console.log('Mock opening TG link:', url) },
           initDataUnsafe: {
             user: {
               id: 123456789,
