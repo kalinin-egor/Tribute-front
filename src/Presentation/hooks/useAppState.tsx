@@ -82,24 +82,8 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const createUserResponse = await tributeApiService.createUser();
-      const userResponse = createUserResponse.user;
-
-      const dashboardData: DashboardResponse = {
-        earn: userResponse.earned,
-        'is-verified': userResponse.is_verified,
-        'is-sub-published': userResponse.is_sub_published,
-        'channels-and-groups': [],
-        subscriptions: [],
-        'payments-history': [],
-      };
-
-      setState({
-        isLoading: false,
-        isOnboarded: true,
-        dashboardData,
-        error: null,
-      });
+      await tributeApiService.createUser();
+      await refreshDashboard();
       
     } catch (error: any) {
       console.error('User creation failed:', error);
@@ -109,7 +93,7 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
         error: error.message || 'User creation failed',
       }));
     }
-  }, []);
+  }, [refreshDashboard]);
 
   const refreshDashboard = useCallback(async () => {
     hasCheckedRef.current = false;
