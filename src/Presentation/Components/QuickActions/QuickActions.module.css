@@ -11,7 +11,7 @@
 }
 
 .icon {
-  @apply text-2xl;
+  @apply w-6 h-6; /* Set a fixed size for the icon images */
 }
 
 /* Specific background colors from screenshot - Tailwind doesn't have these by default */
