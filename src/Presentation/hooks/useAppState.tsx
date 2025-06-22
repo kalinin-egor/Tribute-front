@@ -97,16 +97,31 @@ export const useAppState = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      // First, create the user (or verify they exist)
-      const createUserResponse = await tributeApiService.createUser();
-      console.log('User creation response:', createUserResponse);
-
-      // Then, finalize the onboarding process
-      await tributeApiService.onboard();
+      // Create user, then onboard
+      await tributeApiService.createUser();
+      const onboardResponse = await tributeApiService.onboard();
       
-      // Reset the check flag and check dashboard again
-      hasCheckedRef.current = false;
-      await checkDashboard();
+      const { user } = onboardResponse;
+
+      // Manually construct dashboard data from the onboard response
+      const dashboardData: DashboardResponse = {
+        earn: user.earned,
+        'is-verified': user.is_verified,
+        'is-sub-published': user.is_sub_published,
+        'channels-and-groups': [],
+        subscriptions: [],
+        'payments-history': [],
+      };
+
+      // Set the state to ready and navigate to the dashboard
+      setState({
+        isLoading: false,
+        isOnboarded: true,
+        dashboardData,
+        error: null,
+      });
+      
+      navigate('/dashboard');
       
     } catch (error: any) {
       console.error('Onboarding/User creation failed:', error);
@@ -116,16 +131,9 @@ export const useAppState = () => {
         error: error.message || 'Onboarding failed',
       }));
     }
-  }, [checkDashboard]);
+  }, [navigate]);
 
-  const refreshDashboard = useCallback(async () => {
-    if (state.isOnboarded) {
-      hasCheckedRef.current = false;
-      await checkDashboard();
-    }
-  }, [state.isOnboarded, checkDashboard]);
-
-  useEffect(() => {
+  const refreshDashboard = useEffect(() => {
     console.log('useAppState useEffect triggered, isReady:', isReady, 'webApp:', !!webApp, 'user:', !!user);
     if (isReady) {
       checkDashboard();
