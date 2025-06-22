@@ -83,12 +83,12 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
       const createUserResponse = await tributeApiService.createUser();
-      const { user } = createUserResponse;
+      const userResponse = createUserResponse.user;
 
       const dashboardData: DashboardResponse = {
-        earn: user.earned,
-        'is-verified': user.is_verified,
-        'is-sub-published': user.is_sub_published,
+        earn: userResponse.earned,
+        'is-verified': userResponse.is_verified,
+        'is-sub-published': userResponse.is_sub_published,
         'channels-and-groups': [],
         subscriptions: [],
         'payments-history': [],
