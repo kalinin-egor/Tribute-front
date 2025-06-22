@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { TelegramProvider } from './Presentation/hooks/useTelegram';
-import { useAppState } from './Presentation/hooks/useAppState';
+import { AppStateProvider, useAppState } from './Presentation/hooks/useAppState';
 import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
@@ -82,7 +82,9 @@ function App() {
   return (
     <TelegramProvider>
       <Router>
-        <AppContent />
+        <AppStateProvider>
+          <AppContent />
+        </AppStateProvider>
       </Router>
     </TelegramProvider>
   );

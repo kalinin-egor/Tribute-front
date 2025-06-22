@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext, ReactNode, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from './useTelegram';
 import tributeApiService, { NotFoundError } from '../../Data/api';
@@ -11,7 +11,14 @@ export interface AppState {
   error: string | null;
 }
 
-export const useAppState = () => {
+export interface AppStateContextType extends AppState {
+  onboardUser: () => Promise<void>;
+  refreshDashboard: () => Promise<void>;
+}
+
+const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
+
+export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
   const { isReady } = useTelegram();
   const navigate = useNavigate();
   const hasCheckedRef = useRef(false);
@@ -25,16 +32,16 @@ export const useAppState = () => {
   });
 
   const checkDashboard = useCallback(async () => {
-    if (!isReady || hasCheckedRef.current || isCheckingRef.current) {
+    if (isCheckingRef.current) return;
+    
+    if (!isReady || hasCheckedRef.current) {
       return;
     }
 
-    hasCheckedRef.current = true;
     isCheckingRef.current = true;
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
       const dashboardData = await tributeApiService.getDashboard();
       
       setState(prev => ({
@@ -44,6 +51,7 @@ export const useAppState = () => {
         dashboardData,
         error: null,
       }));
+      hasCheckedRef.current = true;
       
     } catch (error: any) {
       if (
@@ -93,8 +101,6 @@ export const useAppState = () => {
         error: null,
       });
       
-      navigate('/dashboard');
-      
     } catch (error: any) {
       console.error('User creation failed:', error);
       setState(prev => ({
@@ -103,7 +109,7 @@ export const useAppState = () => {
         error: error.message || 'User creation failed',
       }));
     }
-  }, [navigate]);
+  }, []);
 
   const refreshDashboard = useCallback(async () => {
     hasCheckedRef.current = false;
@@ -116,9 +122,23 @@ export const useAppState = () => {
     }
   }, [isReady, checkDashboard]);
 
-  return {
+  const value = {
     ...state,
     onboardUser,
     refreshDashboard,
   };
+
+  return (
+    <AppStateContext.Provider value={value}>
+      {children}
+    </AppStateContext.Provider>
+  );
+};
+
+export const useAppState = () => {
+  const context = useContext(AppStateContext);
+  if (context === undefined) {
+    throw new Error('useAppState must be used within an AppStateProvider');
+  }
+  return context;
 }; 
