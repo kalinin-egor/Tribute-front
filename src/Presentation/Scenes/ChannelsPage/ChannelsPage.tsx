@@ -18,9 +18,37 @@ const ChannelsPage: React.FC = () => {
   const [showConfirmButton, setShowConfirmButton] = useState(false);
   const [channelUsername, setChannelUsername] = useState('');
 
+  // Check if we have channel info from Telegram
+  useEffect(() => {
+    if (webApp && webApp.initDataUnsafe) {
+      const { start_param, chat } = webApp.initDataUnsafe;
+      
+      // If we have start_param with channel info (from bot being added)
+      if (start_param && start_param.startsWith('channel_')) {
+        const channelUsername = start_param.replace('channel_', '');
+        console.log('Channel username from start_param:', channelUsername);
+        setChannelUsername(channelUsername);
+        setShowConfirmButton(true);
+        setIsAddingBot(true);
+      }
+      
+      // If we have chat info (when opened from channel)
+      if (chat && chat.type === 'channel') {
+        const channelUsername = chat.username || chat.title;
+        console.log('Channel info from chat:', channelUsername);
+        if (channelUsername) {
+          setChannelUsername(channelUsername);
+          setShowConfirmButton(true);
+          setIsAddingBot(true);
+        }
+      }
+    }
+  }, [webApp]);
+
   const handleSelectChannel = async () => {
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
-    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
+    // Use start parameter to capture channel info when bot is added
+    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages&start=channel_`;
     
     setIsAddingBot(true);
     setShowConfirmButton(true);
@@ -59,10 +87,16 @@ const ChannelsPage: React.FC = () => {
   };
 
   const handleConfirmClick = () => {
-    const username = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
-    if (username) {
-      setChannelUsername(username);
+    if (channelUsername) {
+      // If we already have channel username from Telegram, use it
       addBotToChannel();
+    } else {
+      // Fallback to manual input
+      const username = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
+      if (username) {
+        setChannelUsername(username);
+        addBotToChannel();
+      }
     }
   };
   
@@ -104,10 +138,18 @@ const ChannelsPage: React.FC = () => {
                 {showConfirmButton && (
                   <div className={styles.confirmSection}>
                     <p className={styles.confirmText}>
-                      После добавления бота в канал, нажмите кнопку ниже:
+                      {channelUsername 
+                        ? `Канал "${channelUsername}" обнаружен. Нажмите кнопку для подтверждения:`
+                        : 'После добавления бота в канал, нажмите кнопку ниже:'
+                      }
                     </p>
+                    {channelUsername && (
+                      <p className={styles.channelInfo}>
+                        Канал: <span className={styles.channelName}>{channelUsername}</span>
+                      </p>
+                    )}
                     <button onClick={handleConfirmClick} className={styles.confirmButton}>
-                      Подтвердить добавление бота
+                      {channelUsername ? 'Подтвердить добавление' : 'Подтвердить добавление бота'}
                     </button>
                   </div>
                 )}
