@@ -3,6 +3,7 @@ import { useAppState } from '../../hooks/useAppState';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
 import EarningsSummary from '../../Components/EarningsSummary/EarningsSummary';
+import DashboardNav from '../../Components/DashboardNav/DashboardNav';
 import PayoutAlert from '../../Components/PayoutAlert/PayoutAlert';
 import GettingStarted from '../../Components/GettingStarted/GettingStarted';
 import MainMenu from '../../Components/MainMenu/MainMenu';
@@ -36,6 +37,8 @@ const CreatorDashboardPage: React.FC = () => {
         earnings={dashboardData.earn}
         isVerified={dashboardData['is-verified']}
       />
+      
+      <DashboardNav />
       
       {!dashboardData['is-verified'] && (
         <PayoutAlert />

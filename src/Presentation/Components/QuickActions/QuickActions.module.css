@@ -3,40 +3,36 @@
 }
 
 .quickActionsContainer {
-  @apply flex overflow-x-auto space-x-3 p-4 -mx-4;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  @apply flex overflow-x-auto gap-3 pb-2;
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none; /* Firefox */
+  touch-action: pan-x; /* Allow horizontal swipe, pass vertical to page */
 }
 
 .quickActionsContainer::-webkit-scrollbar {
-  display: none;
+  display: none; /* Safari and Chrome */
 }
 
 .actionCard {
-  @apply relative flex-shrink-0 w-28 h-40 rounded-lg overflow-hidden flex flex-col justify-end p-2 text-white;
-  background-size: cover;
-  background-position: center;
+  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-[10px] flex flex-col justify-between relative cursor-pointer;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px #f9fafb; /* Inner shadow creates the 1px "gap" */
+}
+
+.unwatched {
+  border-color: #80a2ff;
+}
+
+.watched {
+  border-color: #e0e0e0;
 }
 
 .actionCard p {
-  @apply m-0 text-xs font-bold z-10;
-}
-
-.actionCard::before {
-  content: '';
-  @apply absolute inset-0 bg-black opacity-30;
+  @apply text-xs font-bold z-10;
 }
 
 .icon {
-  @apply absolute top-0 left-0 w-full h-full object-cover;
-}
-
-.unwatched .icon {
-  @apply border-2 border-blue-500 rounded-lg;
-}
-
-.watched .icon {
-  @apply border-2 border-gray-400 rounded-lg;
+  @apply absolute top-2 right-2 w-8 h-8;
 }
 
 /* Specific background colors from screenshot - Tailwind doesn't have these by default */
