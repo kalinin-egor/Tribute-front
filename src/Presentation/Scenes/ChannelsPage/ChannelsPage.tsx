@@ -50,16 +50,16 @@ const ChannelsPage: React.FC = () => {
                 <img src={duckImage} alt="Connect Bot" className={styles.duckImage} />
                 <h1 className={styles.title}>Connect bot</h1>
                 <p className={styles.description}>
-                Add <span className={styles.code}>@tribute</span> as an Admin to your channel and grant permissions.
+                Add <span className={styles.code}>@tribute_egorbot</span> as an Admin to your channel and grant permissions.
                 </p>
                 <a href="https://telegra.ph/Adding-a-Bot-to-a-Channel-as-Admin-05-13" target="_blank" rel="noopener noreferrer" className={styles.link}>
                 Open Detailed Instruction
                 </a>
-            </div>
-            <div className={styles.footer}>
                 <p className={styles.footerText}>
                 The bot won't post or delete anything without your consent.
                 </p>
+            </div>
+            <div className={styles.footer}>
                 <button onClick={handleSelectChannel} className={styles.actionButton}>
                 Select Channel & Add Bot
                 </button>
