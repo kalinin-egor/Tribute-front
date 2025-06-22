@@ -6,10 +6,15 @@ import {
   CreateSubscribeRequest, 
   SetUpPayoutsRequest, 
   UploadVerifiedPassportRequest,
-  TelegramUpdate
+  TelegramUpdate,
+  DashboardResponse
 } from '../../Domain/types';
 
 export const useApi = () => {
+  const getDashboard = useCallback(async (): Promise<DashboardResponse> => {
+    return await tributeApiService.getDashboard();
+  }, []);
+
   const addBot = useCallback(async (request: AddBotRequest) => {
     return await tributeApiService.addBot(request);
   }, []);
@@ -39,6 +44,7 @@ export const useApi = () => {
   }, []);
 
   return {
+    getDashboard,
     addBot,
     publishSubscription,
     createSubscribe,

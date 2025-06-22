@@ -14,6 +14,14 @@ import {
   ErrorResponse
 } from '../Domain/types';
 
+// Custom error class for 404 responses
+export class NotFoundError extends Error {
+  constructor(message: string = 'Resource not found') {
+    super(message);
+    this.name = 'NotFoundError';
+  }
+}
+
 // Use production API URL
 const API_BASE_URL = 'https://gateway.statgram.org/api/v1';
 
@@ -67,6 +75,18 @@ class TributeApiService {
       const response = await fetch(url, config);
       console.log('Response status:', response.status, response.statusText);
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Handle 404 specifically for dashboard endpoint
+      if (response.status === 404 && endpoint === '/dashboard') {
+        console.log('Dashboard not found - user needs onboarding');
+        console.log('Response details:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: url,
+          endpoint: endpoint
+        });
+        throw new NotFoundError('Dashboard not found - user needs onboarding');
+      }
       
       let data;
       const contentType = response.headers.get('content-type');

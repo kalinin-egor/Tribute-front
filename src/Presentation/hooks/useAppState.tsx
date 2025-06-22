@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from './useTelegram';
-import tributeApiService from '../../Data/api';
+import tributeApiService, { NotFoundError } from '../../Data/api';
 import { DashboardResponse } from '../../Domain/types';
 
 export interface AppState {
@@ -55,9 +55,16 @@ export const useAppState = () => {
       
     } catch (error: any) {
       console.error('Dashboard check failed:', error);
+      console.log('Error details:', {
+        name: error.name,
+        message: error.message,
+        isNotFoundError: error instanceof NotFoundError,
+        includes404: error.message?.includes('404'),
+        includesNotFound: error.message?.includes('Not Found')
+      });
       
-      // If user is not onboarded (404), redirect to monetization page
-      if (error.message?.includes('404') || error.message?.includes('Not Found')) {
+      // Check if it's a NotFoundError (404) - user needs onboarding
+      if (error instanceof NotFoundError || error.message?.includes('404') || error.message?.includes('Not Found')) {
         console.log('User not onboarded, redirecting to monetization');
         setState(prev => ({
           ...prev,
