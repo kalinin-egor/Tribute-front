@@ -1,8 +1,7 @@
 .container {
   @apply p-4 min-h-screen;
-  background-color: #f0f0f0; /* Custom color */
 }
 
 .title {
-  @apply text-2xl font-bold mb-4;
+  @apply text-2xl font-bold;
 } 

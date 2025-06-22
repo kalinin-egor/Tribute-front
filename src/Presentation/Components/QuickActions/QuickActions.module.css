@@ -2,16 +2,35 @@
   @apply grid grid-cols-4 gap-2 mb-4;
 }
 
+.quickActionsContainer {
+  @apply flex overflow-x-auto gap-3 pb-2;
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none; /* Firefox */
+}
+
+.quickActionsContainer::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
 .actionCard {
-  @apply rounded-lg p-3 text-left text-sm min-h-[90px] flex flex-col justify-between;
+  @apply flex-shrink-0 w-24 h-24 rounded-lg p-2 text-left text-sm flex flex-col justify-between relative cursor-pointer;
+  border: 2px solid transparent;
+}
+
+.unwatched {
+  border-color: #5ac8fa; /* Blue border for unwatched */
+}
+
+.watched {
+  border-color: #e0e0e0; /* Grey border for watched */
 }
 
 .actionCard p {
-  @apply m-0 mt-2;
+  @apply m-0 mt-2 text-white font-semibold;
 }
 
 .icon {
-  @apply w-6 h-6; /* Set a fixed size for the icon images */
+  @apply w-8 h-8 object-cover rounded-md;
 }
 
 /* Specific background colors from screenshot - Tailwind doesn't have these by default */
