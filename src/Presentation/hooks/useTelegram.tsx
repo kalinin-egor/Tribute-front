@@ -33,6 +33,7 @@ interface TelegramWebApp {
   BackButton: {
     isVisible: boolean;
     onClick: (callback: () => void) => void;
+    offClick: (callback: () => void) => void;
     show: () => void;
     hide: () => void;
   };
@@ -162,6 +163,7 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
           BackButton: {
             isVisible: false,
             onClick: () => {},
+            offClick: () => {},
             show: () => {},
             hide: () => {},
           },
