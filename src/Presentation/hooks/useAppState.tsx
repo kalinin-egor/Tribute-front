@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from './useTelegram';
 import tributeApiService from '../../Data/api';
@@ -12,8 +12,10 @@ export interface AppState {
 }
 
 export const useAppState = () => {
-  const { isReady } = useTelegram();
+  const { isReady, webApp, user } = useTelegram();
   const navigate = useNavigate();
+  const hasCheckedRef = useRef(false);
+  const isCheckingRef = useRef(false);
   
   const [state, setState] = useState<AppState>({
     isLoading: true,
@@ -23,13 +25,22 @@ export const useAppState = () => {
   });
 
   const checkDashboard = useCallback(async () => {
-    if (!isReady) return;
+    console.log('checkDashboard called, isReady:', isReady, 'hasChecked:', hasCheckedRef.current, 'isChecking:', isCheckingRef.current);
+    if (!isReady || hasCheckedRef.current || isCheckingRef.current) {
+      console.log('Telegram not ready yet, already checked, or currently checking');
+      return;
+    }
+
+    hasCheckedRef.current = true;
+    isCheckingRef.current = true;
 
     try {
+      console.log('Starting dashboard check...');
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
       // Try to get dashboard data
       const dashboardData = await tributeApiService.getDashboard();
+      console.log('Dashboard data received:', dashboardData);
       
       setState(prev => ({
         ...prev,
@@ -47,6 +58,7 @@ export const useAppState = () => {
       
       // If user is not onboarded (404), redirect to monetization page
       if (error.message?.includes('404') || error.message?.includes('Not Found')) {
+        console.log('User not onboarded, redirecting to monetization');
         setState(prev => ({
           ...prev,
           isLoading: false,
@@ -57,12 +69,15 @@ export const useAppState = () => {
         navigate('/monetization');
       } else {
         // Other errors
+        console.log('Other error occurred:', error.message);
         setState(prev => ({
           ...prev,
           isLoading: false,
           error: error.message || 'An error occurred',
         }));
       }
+    } finally {
+      isCheckingRef.current = false;
     }
   }, [isReady, navigate]);
 
@@ -72,7 +87,8 @@ export const useAppState = () => {
       
       await tributeApiService.onboard();
       
-      // After successful onboarding, check dashboard again
+      // Reset the check flag and check dashboard again
+      hasCheckedRef.current = false;
       await checkDashboard();
       
     } catch (error: any) {
@@ -87,11 +103,13 @@ export const useAppState = () => {
 
   const refreshDashboard = useCallback(async () => {
     if (state.isOnboarded) {
+      hasCheckedRef.current = false;
       await checkDashboard();
     }
   }, [state.isOnboarded, checkDashboard]);
 
   useEffect(() => {
+    console.log('useAppState useEffect triggered, isReady:', isReady, 'webApp:', !!webApp, 'user:', !!user);
     if (isReady) {
       checkDashboard();
     }

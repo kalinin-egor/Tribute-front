@@ -6,6 +6,7 @@ import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
 import CreatorDashboardPage from './Presentation/Scenes/CreatorDashboardPage/CreatorDashboardPage';
+import TestPage from './Presentation/Scenes/TestPage/TestPage';
 import Layout from './Presentation/Components/Layout';
 
 declare global {
@@ -17,20 +18,30 @@ declare global {
 }
 
 function AppContent() {
-  const { isLoading, error } = useAppState();
+  const { isLoading, error, isOnboarded, dashboardData } = useAppState();
 
   useEffect(() => {
+    console.log('AppContent mounted');
+    console.log('App state:', { isLoading, error, isOnboarded, hasDashboardData: !!dashboardData });
+    
     // Initialize Telegram Web App
     if (window.Telegram?.WebApp) {
+      console.log('Initializing Telegram WebApp...');
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
       // Set the background color to white for the whole app
       window.Telegram.WebApp.setHeaderColor('#ffffff');
       window.Telegram.WebApp.setBackgroundColor('#ffffff');
+      console.log('Telegram WebApp initialized');
+    } else {
+      console.log('Telegram WebApp not available in AppContent');
     }
   }, []);
 
+  console.log('AppContent render:', { isLoading, error, isOnboarded, hasDashboardData: !!dashboardData });
+
   if (isLoading) {
+    console.log('Showing loading screen');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -42,6 +53,7 @@ function AppContent() {
   }
 
   if (error) {
+    console.log('Showing error screen:', error);
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -58,6 +70,7 @@ function AppContent() {
     );
   }
 
+  console.log('Rendering main app content');
   return (
     <Layout>
       <Routes>
@@ -65,6 +78,7 @@ function AppContent() {
         <Route path="/monetization" element={<MonetizationPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/dashboard" element={<CreatorDashboardPage />} />
+        <Route path="/test" element={<TestPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
@@ -72,6 +86,7 @@ function AppContent() {
 }
 
 function App() {
+  console.log('App component rendering');
   return (
     <TelegramProvider>
       <Router>

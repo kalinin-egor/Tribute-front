@@ -109,17 +109,101 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
   const [themeParams, setThemeParams] = useState<TelegramWebApp['themeParams']>({});
 
   useEffect(() => {
+    console.log('TelegramProvider useEffect - checking for Telegram WebApp');
+    console.log('window.Telegram:', !!window.Telegram);
+    console.log('window.Telegram?.WebApp:', !!window.Telegram?.WebApp);
+    
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
+      console.log('Telegram WebApp found:', tg);
+      console.log('initData:', tg.initData ? 'present' : 'missing');
+      console.log('initDataUnsafe:', tg.initDataUnsafe);
+      
       setWebApp(tg);
       
       if (tg.initDataUnsafe?.user) {
+        console.log('User data found:', tg.initDataUnsafe.user);
         setUser(tg.initDataUnsafe.user);
+      } else {
+        console.log('No user data in initDataUnsafe');
       }
       
       setTheme(tg.colorScheme);
       setThemeParams(tg.themeParams);
       setIsReady(true);
+      console.log('Telegram WebApp initialized successfully');
+    } else {
+      console.log('Telegram WebApp not available - running in browser mode');
+      // For development, we can simulate Telegram WebApp
+      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isDevelopment) {
+        console.log('Development mode - simulating Telegram WebApp');
+        const mockWebApp = {
+          ready: () => console.log('Mock WebApp ready'),
+          expand: () => console.log('Mock WebApp expand'),
+          close: () => console.log('Mock WebApp close'),
+          MainButton: {
+            text: '',
+            color: '',
+            textColor: '',
+            isVisible: false,
+            isActive: false,
+            isProgressVisible: false,
+            setText: () => {},
+            onClick: () => {},
+            offClick: () => {},
+            show: () => {},
+            hide: () => {},
+            enable: () => {},
+            disable: () => {},
+            showProgress: () => {},
+            hideProgress: () => {},
+          },
+          BackButton: {
+            isVisible: false,
+            onClick: () => {},
+            show: () => {},
+            hide: () => {},
+          },
+          initData: 'mock-init-data-for-development',
+          initDataUnsafe: {
+            user: {
+              id: 123456789,
+              first_name: 'Test',
+              last_name: 'User',
+              username: 'testuser',
+              language_code: 'en',
+            }
+          },
+          colorScheme: 'light' as const,
+          themeParams: {},
+          isExpanded: false,
+          viewportHeight: 600,
+          viewportStableHeight: 600,
+          headerColor: '#ffffff',
+          backgroundColor: '#ffffff',
+          isClosingConfirmationEnabled: false,
+          HapticFeedback: {
+            impactOccurred: () => {},
+            notificationOccurred: () => {},
+            selectionChanged: () => {},
+          },
+          CloudStorage: {
+            getItem: async () => null,
+            setItem: async () => {},
+            getItems: async () => ({}),
+            removeItem: async () => {},
+            removeItems: async () => {},
+          },
+        };
+        
+        setWebApp(mockWebApp as any);
+        setUser(mockWebApp.initDataUnsafe.user);
+        setTheme('light');
+        setThemeParams({});
+        setIsReady(true);
+        console.log('Mock Telegram WebApp initialized for development');
+      }
     }
   }, []);
 

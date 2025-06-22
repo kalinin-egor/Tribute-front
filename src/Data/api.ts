@@ -14,13 +14,17 @@ import {
   ErrorResponse
 } from '../Domain/types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://gateway.statgram.org/api/v1';
+// Use production API URL
+const API_BASE_URL = 'https://gateway.statgram.org/api/v1';
 
 class TributeApiService {
   private getAuthHeader(): string | null {
     if (window.Telegram?.WebApp?.initData) {
-      return `TgAuth ${window.Telegram.WebApp.initData}`;
+      const authHeader = `TgAuth ${window.Telegram.WebApp.initData}`;
+      console.log('Auth header generated:', authHeader.substring(0, 50) + '...');
+      return authHeader;
     }
+    console.log('No Telegram WebApp or initData available');
     return null;
   }
 
@@ -29,10 +33,12 @@ class TributeApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
+    console.log('Making API request to:', url);
     
     const authHeader = this.getAuthHeader();
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
 
     if (authHeader) {
@@ -45,19 +51,45 @@ class TributeApiService {
         ...defaultHeaders,
         ...options.headers,
       },
+      mode: 'cors',
+      credentials: 'omit',
     };
+
+    console.log('Request config:', {
+      url,
+      method: config.method || 'GET',
+      headers: config.headers,
+      hasBody: !!config.body,
+      mode: config.mode
+    });
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      console.log('Response status:', response.status, response.statusText);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+      console.log('Response data:', data);
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        const errorMessage = typeof data === 'object' && data.error 
+          ? data.error 
+          : `HTTP error! status: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       return data;
     } catch (error) {
       console.error('API request failed:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error - please check your internet connection');
+      }
       throw error;
     }
   }
@@ -69,11 +101,13 @@ class TributeApiService {
 
   // Dashboard
   async getDashboard(): Promise<DashboardResponse> {
+    console.log('Getting dashboard data...');
     return this.request<DashboardResponse>('/dashboard');
   }
 
   // Onboard
   async onboard(): Promise<OnboardResponse> {
+    console.log('Onboarding user...');
     return this.request<OnboardResponse>('/onboard', {
       method: 'PUT',
     });
