@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChannelDTO } from '../../../Domain/types';
 import styles from './QuickActions.module.css';
 import StoryViewer from '../../Scenes/CreatorDashboardPage/components/StoryViewer/StoryViewer';
 
@@ -27,7 +28,13 @@ const initialActions = [
     { id: 'monetization-methods', title: 'Monetization methods', icon: images('./monetization-methods/1.png'), watched: false, color: '#1dd1a1', slides: getSlides('monetization-methods', 5) },
 ];
 
-const QuickActions: React.FC = () => {
+interface QuickActionsProps {
+  channels: ChannelDTO[];
+  isSubPublished: boolean;
+  onRefresh: () => Promise<void>;
+}
+
+const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, onRefresh }) => {
   const [actions, setActions] = useState(initialActions);
   const [activeStory, setActiveStory] = useState<any | null>(null);
 
@@ -62,6 +69,24 @@ const QuickActions: React.FC = () => {
           </div>
         ))}
       </div>
+      
+      {/* Show channel status */}
+      <div className={styles.channelStatus}>
+        <h3>Your Channels ({channels.length})</h3>
+        {channels.length > 0 ? (
+          <div className={styles.channelsList}>
+            {channels.map((channel, index) => (
+              <div key={index} className={styles.channelItem}>
+                <span>@{channel.channel_username}</span>
+                {isSubPublished && <span className={styles.published}>✓ Published</span>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className={styles.noChannels}>No channels connected yet</p>
+        )}
+      </div>
+      
       {activeStory && <StoryViewer slides={activeStory.slides} onClose={handleCloseViewer} />}
     </>
   );

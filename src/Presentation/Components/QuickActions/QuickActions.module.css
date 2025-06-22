@@ -39,4 +39,31 @@
 .actionCard:nth-child(1) { background-color: #a97fff; @apply text-white; }
 .actionCard:nth-child(2) { background-color: #5ac8fa; @apply text-white; }
 .actionCard:nth-child(3) { background-color: #ffcc00; @apply text-black; }
-.actionCard:nth-child(4) { background-color: #78cbf2; @apply text-white; } 
+.actionCard:nth-child(4) { background-color: #78cbf2; @apply text-white; }
+
+/* Channel status styles */
+.channelStatus {
+  @apply bg-white rounded-lg p-4 mb-4;
+}
+
+.channelStatus h3 {
+  @apply text-lg font-semibold mb-3;
+}
+
+.channelsList {
+  @apply space-y-2;
+}
+
+.channelItem {
+  @apply flex justify-between items-center p-2 bg-gray-50 rounded;
+}
+
+.published {
+  @apply text-sm font-medium px-2 py-1 rounded;
+  background-color: #10b981;
+  color: white;
+}
+
+.noChannels {
+  @apply text-gray-500 text-center py-4;
+} 

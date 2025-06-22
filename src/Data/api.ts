@@ -1,17 +1,43 @@
-import { ApiResponse, User, Tribute, CreateTributeForm } from '../Domain/types';
+import { 
+  DashboardResponse, 
+  OnboardResponse, 
+  AddBotRequest, 
+  AddBotResponse,
+  PublishSubscriptionRequest,
+  PublishSubscriptionResponse,
+  CreateSubscribeRequest,
+  SetUpPayoutsRequest,
+  UploadVerifiedPassportRequest,
+  MessageResponse,
+  StatusResponse,
+  TelegramUpdate,
+  ErrorResponse
+} from '../Domain/types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://gateway.statgram.org/api/v1';
 
-class ApiService {
+class TributeApiService {
+  private getAuthHeader(): string | null {
+    if (window.Telegram?.WebApp?.initData) {
+      return `TgAuth ${window.Telegram.WebApp.initData}`;
+    }
+    return null;
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     
-    const defaultHeaders = {
+    const authHeader = this.getAuthHeader();
+    const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
+
+    if (authHeader) {
+      defaultHeaders['Authorization'] = authHeader;
+    }
 
     const config: RequestInit = {
       ...options,
@@ -32,67 +58,75 @@ class ApiService {
       return data;
     } catch (error) {
       console.error('API request failed:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
-      };
+      throw error;
     }
   }
 
-  // User endpoints
-  async getCurrentUser(): Promise<ApiResponse<User>> {
-    return this.request<User>('/user/me');
+  // Health check
+  async healthCheck(): Promise<any> {
+    return this.request<any>('/health');
   }
 
-  async updateUser(userData: Partial<User>): Promise<ApiResponse<User>> {
-    return this.request<User>('/user/me', {
+  // Dashboard
+  async getDashboard(): Promise<DashboardResponse> {
+    return this.request<DashboardResponse>('/dashboard');
+  }
+
+  // Onboard
+  async onboard(): Promise<OnboardResponse> {
+    return this.request<OnboardResponse>('/onboard', {
       method: 'PUT',
-      body: JSON.stringify(userData),
     });
   }
 
-  // Tribute endpoints
-  async getTributes(): Promise<ApiResponse<Tribute[]>> {
-    return this.request<Tribute[]>('/tributes');
-  }
-
-  async getTributeById(id: string): Promise<ApiResponse<Tribute>> {
-    return this.request<Tribute>(`/tributes/${id}`);
-  }
-
-  async createTribute(tributeData: CreateTributeForm): Promise<ApiResponse<Tribute>> {
-    return this.request<Tribute>('/tributes', {
+  // Add Bot
+  async addBot(request: AddBotRequest): Promise<AddBotResponse> {
+    return this.request<AddBotResponse>('/add-bot', {
       method: 'POST',
-      body: JSON.stringify(tributeData),
+      body: JSON.stringify(request),
     });
   }
 
-  async updateTribute(id: string, tributeData: Partial<Tribute>): Promise<ApiResponse<Tribute>> {
-    return this.request<Tribute>(`/tributes/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(tributeData),
+  // Publish Subscription
+  async publishSubscription(request: PublishSubscriptionRequest): Promise<PublishSubscriptionResponse> {
+    return this.request<PublishSubscriptionResponse>('/publish-subscription', {
+      method: 'POST',
+      body: JSON.stringify(request),
     });
   }
 
-  async deleteTribute(id: string): Promise<ApiResponse<void>> {
-    return this.request<void>(`/tributes/${id}`, {
-      method: 'DELETE',
+  // Create Subscribe
+  async createSubscribe(request: CreateSubscribeRequest): Promise<MessageResponse> {
+    return this.request<MessageResponse>('/create-subscribe', {
+      method: 'POST',
+      body: JSON.stringify(request),
     });
   }
 
-  // User tributes
-  async getUserTributes(userId: number): Promise<ApiResponse<Tribute[]>> {
-    return this.request<Tribute[]>(`/users/${userId}/tributes`);
+  // Set Up Payouts
+  async setUpPayouts(request: SetUpPayoutsRequest): Promise<MessageResponse> {
+    return this.request<MessageResponse>('/set-up-payouts', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
   }
 
-  async getReceivedTributes(): Promise<ApiResponse<Tribute[]>> {
-    return this.request<Tribute[]>('/tributes/received');
+  // Upload Verified Passport
+  async uploadVerifiedPassport(request: UploadVerifiedPassportRequest): Promise<MessageResponse> {
+    return this.request<MessageResponse>('/upload-verified-passport', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
   }
 
-  async getGivenTributes(): Promise<ApiResponse<Tribute[]>> {
-    return this.request<Tribute[]>('/tributes/given');
+  // Check Verified Passport (public endpoint)
+  async checkVerifiedPassport(update: TelegramUpdate): Promise<StatusResponse> {
+    return this.request<StatusResponse>('/check-verified-passport', {
+      method: 'POST',
+      body: JSON.stringify(update),
+    });
   }
 }
 
-export const apiService = new ApiService();
-export default apiService; 
+export const tributeApiService = new TributeApiService();
+export default tributeApiService; 

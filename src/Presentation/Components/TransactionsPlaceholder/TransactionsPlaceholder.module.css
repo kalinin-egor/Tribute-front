@@ -12,4 +12,49 @@
 
 .subtitle {
   @apply text-gray-500 max-w-[250px] mx-auto;
+}
+
+/* Transaction styles */
+.transactionsContainer {
+  @apply bg-white rounded-lg p-4;
+}
+
+.sectionTitle {
+  @apply text-lg font-semibold mb-4;
+}
+
+.section {
+  @apply mb-6;
+}
+
+.subsectionTitle {
+  @apply text-base font-medium mb-3 text-gray-700;
+}
+
+.transactionsList {
+  @apply space-y-3;
+}
+
+.transactionItem {
+  @apply p-3 bg-gray-50 rounded-lg;
+}
+
+.transactionInfo {
+  @apply flex justify-between items-center mb-1;
+}
+
+.transactionDescription {
+  @apply font-medium text-gray-900;
+}
+
+.transactionDate {
+  @apply text-sm text-gray-500;
+}
+
+.transactionPrice {
+  @apply font-semibold text-green-600;
+}
+
+.transactionSubtitle {
+  @apply text-sm text-gray-600 mt-1;
 } 

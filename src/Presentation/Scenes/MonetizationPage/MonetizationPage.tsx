@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTelegram } from '../../hooks/useTelegram';
+import { useAppState } from '../../hooks/useAppState';
 import FeatureItem from '../../Components/FeatureItem';
 import moneyDuckImage from '../../../assets/images/money-duck.png';
 import { FaHeart, FaStar, FaBox, FaTruck, FaBroadcastTower, FaUsers, FaUser, FaChartBar } from 'react-icons/fa';
@@ -9,7 +10,9 @@ import { MonetizationPageProps, Feature, MonetizationPageState, MonetizationPage
 
 const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   const { webApp } = useTelegram();
+  const { onboardUser } = useAppState();
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(false);
 
   const features: Feature[] = [
     {
@@ -62,17 +65,30 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
     },
   ];
 
-  const handlers: MonetizationPageHandlers = {
-    handleMonetizeClick: () => {
+  const handleOnboarding = async () => {
+    if (!termsAccepted) return;
+
+    try {
+      setIsOnboarding(true);
       if (webApp) {
         webApp.HapticFeedback.notificationOccurred('success');
-        webApp.close();
-      } else {
-        // Fallback for browser environment
-        alert('Monetization successful!');
-        console.log('Monetization logic triggered in browser.');
       }
-    },
+      
+      await onboardUser();
+      
+    } catch (error) {
+      console.error('Onboarding failed:', error);
+      if (webApp) {
+        webApp.HapticFeedback.notificationOccurred('error');
+      }
+      alert('Ошибка при регистрации. Попробуйте еще раз.');
+    } finally {
+      setIsOnboarding(false);
+    }
+  };
+
+  const handlers: MonetizationPageHandlers = {
+    handleMonetizeClick: handleOnboarding,
     handleTermsChange: (accepted: boolean) => {
       setTermsAccepted(accepted);
     },
@@ -81,7 +97,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   useEffect(() => {
     if (!webApp) return;
 
-    webApp.MainButton.setText('Монетизироваться');
+    webApp.MainButton.setText(isOnboarding ? 'Регистрация...' : 'Монетизироваться');
     webApp.MainButton.color = '#30a4fc';
     webApp.MainButton.onClick(handlers.handleMonetizeClick);
     webApp.MainButton.show();
@@ -90,17 +106,17 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
       webApp.MainButton.offClick(handlers.handleMonetizeClick);
       webApp.MainButton.hide();
     };
-  }, [webApp]);
+  }, [webApp, isOnboarding]);
 
   useEffect(() => {
     if (!webApp) return;
     
-    if (termsAccepted) {
+    if (termsAccepted && !isOnboarding) {
       webApp.MainButton.enable();
     } else {
       webApp.MainButton.disable();
     }
-  }, [termsAccepted, webApp]);
+  }, [termsAccepted, isOnboarding, webApp]);
 
   return (
     <div className={styles.container}>
@@ -137,6 +153,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
             checked={termsAccepted}
             onChange={(e) => handlers.handleTermsChange(e.target.checked)}
             className={styles.termsCheckbox}
+            disabled={isOnboarding}
           />
           <label htmlFor="terms" className={styles.termsLabel}>
             Я принимаю <a href="#" className={styles.termsLink}>условия использования</a>
@@ -150,14 +167,14 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
            <div className={styles.fallbackButtonContent}>
               <button
                 onClick={handlers.handleMonetizeClick}
-                disabled={!termsAccepted}
+                disabled={!termsAccepted || isOnboarding}
                 className={`${styles.fallbackButtonElement} ${
-                  termsAccepted 
+                  termsAccepted && !isOnboarding
                     ? styles.fallbackButtonElementEnabled
                     : styles.fallbackButtonElementDisabled
                 }`}
               >
-                Монетизироваться
+                {isOnboarding ? 'Регистрация...' : 'Монетизироваться'}
               </button>
            </div>
         </div>
