@@ -1,5 +1,5 @@
 .container {
-  @apply p-4 min-h-screen;
+  @apply p-4 min-h-screen bg-gray-50 dark:bg-gray-900;
 }
 
 .title {
