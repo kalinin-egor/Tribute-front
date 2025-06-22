@@ -11,6 +11,10 @@ import {
 } from '../../Domain/types';
 
 export const useApi = () => {
+  const createUser = useCallback(async () => {
+    return await tributeApiService.createUser();
+  }, []);
+
   const getDashboard = useCallback(async (): Promise<DashboardResponse> => {
     return await tributeApiService.getDashboard();
   }, []);
@@ -44,6 +48,7 @@ export const useApi = () => {
   }, []);
 
   return {
+    createUser,
     getDashboard,
     addBot,
     publishSubscription,

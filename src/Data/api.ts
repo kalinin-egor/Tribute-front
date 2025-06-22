@@ -11,7 +11,8 @@ import {
   MessageResponse,
   StatusResponse,
   TelegramUpdate,
-  ErrorResponse
+  ErrorResponse,
+  CreateUserResponse
 } from '../Domain/types';
 
 // Custom error class for 404 responses
@@ -130,6 +131,14 @@ class TributeApiService {
     console.log('Onboarding user...');
     return this.request<OnboardResponse>('/onboard', {
       method: 'PUT',
+    });
+  }
+
+  // Create User
+  async createUser(): Promise<CreateUserResponse> {
+    console.log('Creating user...');
+    return this.request<CreateUserResponse>('/create-user', {
+      method: 'POST',
     });
   }
 

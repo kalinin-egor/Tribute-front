@@ -3,7 +3,7 @@ import { useTelegram } from '../../hooks/useTelegram';
 import { useAppState } from '../../hooks/useAppState';
 import FeatureItem from '../../Components/FeatureItem';
 import moneyDuckImage from '../../../assets/images/money-duck.png';
-import { FaHeart, FaStar, FaBox, FaTruck, FaBroadcastTower, FaUsers, FaUser, FaChartBar } from 'react-icons/fa';
+import { FaHeart, FaStar, FaBox, FaTruck, FaBroadcastTower, FaUsers, FaUser, FaChartBar, FaSpinner } from 'react-icons/fa';
 import { isTelegramWebApp } from '../../../utils/helpers';
 import styles from './MonetizationPage.module.css';
 import { MonetizationPageProps, Feature, MonetizationPageState, MonetizationPageHandlers } from './MonetizationPage.types';
@@ -66,24 +66,26 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   ];
 
   const handleOnboarding = async () => {
-    if (!termsAccepted) return;
+    if (!termsAccepted || isOnboarding) return;
+
+    setIsOnboarding(true);
+    if (isTelegramWebApp() && webApp) {
+      webApp.MainButton.showProgress();
+    }
 
     try {
-      setIsOnboarding(true);
-      if (webApp) {
-        webApp.HapticFeedback.notificationOccurred('success');
-      }
-      
       await onboardUser();
-      
     } catch (error) {
       console.error('Onboarding failed:', error);
-      if (webApp) {
+      if (isTelegramWebApp() && webApp) {
         webApp.HapticFeedback.notificationOccurred('error');
       }
       alert('Ошибка при регистрации. Попробуйте еще раз.');
     } finally {
       setIsOnboarding(false);
+      if (isTelegramWebApp() && webApp) {
+        webApp.MainButton.hideProgress();
+      }
     }
   };
 
@@ -174,7 +176,14 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
                     : styles.fallbackButtonElementDisabled
                 }`}
               >
-                {isOnboarding ? 'Регистрация...' : 'Монетизироваться'}
+                {isOnboarding ? (
+                  <>
+                    <FaSpinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    Регистрация...
+                  </>
+                ) : (
+                  'Монетизироваться'
+                )}
               </button>
            </div>
         </div>

@@ -103,6 +103,13 @@ export interface OnboardResponse {
   user: UserResponse;
 }
 
+// Create User Response
+export interface CreateUserResponse {
+  message: string;
+  user: UserResponse;
+  created: boolean;
+}
+
 // Add Bot Request/Response
 export interface AddBotRequest {
   'bot-username': string;

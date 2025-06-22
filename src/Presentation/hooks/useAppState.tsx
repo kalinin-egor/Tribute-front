@@ -97,6 +97,11 @@ export const useAppState = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
+      // First, create the user (or verify they exist)
+      const createUserResponse = await tributeApiService.createUser();
+      console.log('User creation response:', createUserResponse);
+
+      // Then, finalize the onboarding process
       await tributeApiService.onboard();
       
       // Reset the check flag and check dashboard again
@@ -104,7 +109,7 @@ export const useAppState = () => {
       await checkDashboard();
       
     } catch (error: any) {
-      console.error('Onboarding failed:', error);
+      console.error('Onboarding/User creation failed:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
