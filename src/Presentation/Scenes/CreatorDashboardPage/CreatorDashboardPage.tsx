@@ -27,15 +27,15 @@ const CreatorDashboardPage: React.FC = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>Creator Dashboard</h1>
       
-      <EarningsSummary 
-        earnings={dashboardData.earn}
-        isVerified={dashboardData['is-verified']}
-      />
-      
       <QuickActions 
         channels={dashboardData['channels-and-groups']}
         isSubPublished={dashboardData['is-sub-published']}
         onRefresh={refreshDashboard}
+      />
+      
+      <EarningsSummary 
+        earnings={dashboardData.earn}
+        isVerified={dashboardData['is-verified']}
       />
       
       <DashboardNav />
