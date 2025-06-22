@@ -97,12 +97,6 @@ export interface UserResponse {
   is_verified: boolean;
 }
 
-// Onboard Response
-export interface OnboardResponse {
-  message: string;
-  user: UserResponse;
-}
-
 // Create User Response
 export interface CreateUserResponse {
   message: string;

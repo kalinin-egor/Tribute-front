@@ -1,6 +1,6 @@
 import { 
   DashboardResponse, 
-  OnboardResponse, 
+  CreateUserResponse,
   AddBotRequest, 
   AddBotResponse,
   PublishSubscriptionRequest,
@@ -11,8 +11,7 @@ import {
   MessageResponse,
   StatusResponse,
   TelegramUpdate,
-  ErrorResponse,
-  CreateUserResponse
+  ErrorResponse
 } from '../Domain/types';
 
 // Custom error class for 404 responses
@@ -124,14 +123,6 @@ class TributeApiService {
   async getDashboard(): Promise<DashboardResponse> {
     console.log('Getting dashboard data...');
     return this.request<DashboardResponse>('/dashboard');
-  }
-
-  // Onboard
-  async onboard(): Promise<OnboardResponse> {
-    console.log('Onboarding user...');
-    return this.request<OnboardResponse>('/onboard', {
-      method: 'PUT',
-    });
   }
 
   // Create User

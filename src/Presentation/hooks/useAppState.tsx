@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTelegram } from './useTelegram';
 import tributeApiService, { NotFoundError } from '../../Data/api';
-import { DashboardResponse, OnboardResponse } from '../../Domain/types';
+import { DashboardResponse } from '../../Domain/types';
 
 export interface AppState {
   isLoading: boolean;
@@ -11,7 +12,8 @@ export interface AppState {
 }
 
 export const useAppState = () => {
-  const { isReady, webApp, user } = useTelegram();
+  const { isReady } = useTelegram();
+  const navigate = useNavigate();
   const hasCheckedRef = useRef(false);
   const isCheckingRef = useRef(false);
   
@@ -72,10 +74,8 @@ export const useAppState = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      await tributeApiService.createUser();
-      const onboardResponse = await tributeApiService.onboard();
-      
-      const { user } = onboardResponse;
+      const createUserResponse = await tributeApiService.createUser();
+      const { user } = createUserResponse;
 
       const dashboardData: DashboardResponse = {
         earn: user.earned,
@@ -93,15 +93,17 @@ export const useAppState = () => {
         error: null,
       });
       
+      navigate('/dashboard');
+      
     } catch (error: any) {
-      console.error('Onboarding/User creation failed:', error);
+      console.error('User creation failed:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message || 'Onboarding failed',
+        error: error.message || 'User creation failed',
       }));
     }
-  }, []);
+  }, [navigate]);
 
   const refreshDashboard = useCallback(async () => {
     hasCheckedRef.current = false;
