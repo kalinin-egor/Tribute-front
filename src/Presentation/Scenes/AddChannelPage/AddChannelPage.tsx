@@ -15,7 +15,7 @@ const AddChannelPage: React.FC = () => {
   const handleSelectChannel = () => {
     // This link opens the native Telegram UI to select a channel to add the bot to.
     // Replace 'tribute' with your actual bot username if it's different.
-    const botUsername = 'tribute'; // Replace with your bot's username
+    const botUsername = process.env.BOT_USERNAME || 'tribute'; // Replace with your bot's username
     const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
     if (webApp) {
       webApp.openTelegramLink(url);
