@@ -1,24 +1,62 @@
 .alert {
-  @apply bg-white rounded-lg p-4 mb-4 flex items-center cursor-pointer;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--tg-theme-secondary-bg-color, #f8f9fa);
+  border-radius: 12px;
+  margin: 16px 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+}
+
+.alert:hover {
+  background-color: var(--tg-theme-hint-color, #e8e8e8);
+}
+
+.alert:active {
+  transform: translateY(1px);
 }
 
 .icon {
-  @apply text-2xl mr-3;
+  font-size: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .textContainer {
-  @apply flex-grow;
+  flex: 1;
+  min-width: 0;
 }
 
 .title {
-  @apply font-bold;
-  color: #ff9500; /* Custom color */
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #000000);
+  margin-bottom: 4px;
 }
 
 .subtitle {
-  @apply text-sm text-gray-500;
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, #666666);
+  line-height: 1.4;
 }
 
 .arrow {
-  @apply text-xl text-gray-300;
+  font-size: 18px;
+  color: var(--tg-theme-hint-color, #999999);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .alert {
+    background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
+    border-color: var(--tg-theme-hint-color, #444444);
+  }
+  
+  .alert:hover {
+    background-color: var(--tg-theme-hint-color, #3a3a3a);
+  }
 } 

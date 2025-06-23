@@ -7,6 +7,7 @@ import MonetizationPage from './Presentation/Scenes/MonetizationPage/Monetizatio
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
 import CreatorDashboardPage from './Presentation/Scenes/CreatorDashboardPage/CreatorDashboardPage';
 import ChannelsPage from './Presentation/Scenes/ChannelsPage/ChannelsPage';
+import SetUpPayoutsPage from './Presentation/Scenes/SetUpPayoutsPage/SetUpPayoutsPage';
 import Layout from './Presentation/Components/Layout';
 
 declare global {
@@ -66,6 +67,7 @@ function AppContent() {
             <Route path="/dashboard" element={<CreatorDashboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/channels" element={<ChannelsPage />} />
+            <Route path="/set-up-payouts" element={<SetUpPayoutsPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
         ) : (

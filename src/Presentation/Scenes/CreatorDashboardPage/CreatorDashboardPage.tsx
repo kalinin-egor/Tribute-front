@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
@@ -11,17 +12,25 @@ import TransactionsPlaceholder from '../../Components/TransactionsPlaceholder/Tr
 
 const CreatorDashboardPage: React.FC = () => {
   const { dashboardData, refreshDashboard } = useAppState();
+  const navigate = useNavigate();
+
+  const handlePayoutClick = () => {
+    navigate('/set-up-payouts');
+  };
 
   if (!dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="gray-600">Loading dashboard...</p>
         </div>
       </div>
     );
   }
+
+  // Check if card number is empty (not set up)
+  const isCardNotSetUp = !dashboardData.card_number || dashboardData.card_number.trim() === '';
 
   return (
     <div className={styles.container}>
@@ -40,8 +49,9 @@ const CreatorDashboardPage: React.FC = () => {
       
       <DashboardNav />
       
-      {!dashboardData['is-verified'] && (
-        <PayoutAlert />
+      {/* Show PayoutAlert only if card is not set up */}
+      {isCardNotSetUp && (
+        <PayoutAlert onClick={handlePayoutClick} />
       )}
       
       {dashboardData['channels-and-groups'].length === 0 && (

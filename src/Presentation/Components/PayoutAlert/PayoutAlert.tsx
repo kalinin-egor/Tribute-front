@@ -1,9 +1,13 @@
 import React from 'react';
 import styles from './PayoutAlert.module.css';
 
-const PayoutAlert: React.FC = () => {
+interface PayoutAlertProps {
+  onClick?: () => void;
+}
+
+const PayoutAlert: React.FC<PayoutAlertProps> = ({ onClick }) => {
   return (
-    <div className={styles.alert}>
+    <div className={styles.alert} onClick={onClick}>
       <div className={styles.icon}>⚠️</div>
       <div className={styles.textContainer}>
         <div className={styles.title}>Set Up Payouts</div>

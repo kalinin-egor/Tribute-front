@@ -66,6 +66,7 @@ export interface DashboardResponse {
   subscriptions: SubDTO[];
   'is-sub-published': boolean;
   'payments-history': PaymentDTO[];
+  card_number: string;
 }
 
 // Channel types
@@ -139,9 +140,6 @@ export interface CreateSubscribeRequest {
 // Set Up Payouts Request
 export interface SetUpPayoutsRequest {
   'card-number': string;
-  'card-date': string;
-  'card-cvv': string;
-  access_token: string;
 }
 
 // Upload Verified Passport Request
