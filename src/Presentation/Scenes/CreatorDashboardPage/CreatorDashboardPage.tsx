@@ -24,7 +24,6 @@ const CreatorDashboardPage: React.FC = () => {
   const handleVerifyClick = () => {
     if (webApp) {
       webApp.sendData('verify-account');
-      webApp.close();
     }
   };
 
