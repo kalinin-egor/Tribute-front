@@ -22,8 +22,12 @@ const CreatorDashboardPage: React.FC = () => {
   };
 
   const handleVerifyClick = () => {
-    if (webApp) {
-      webApp.sendData('verify-account');
+    console.log('window.Telegram:', window.Telegram);
+    console.log('window.Telegram.WebApp:', window.Telegram?.WebApp);
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.sendData('verify-account');
+    } else {
+      alert('Not in Telegram WebApp');
     }
   };
 
