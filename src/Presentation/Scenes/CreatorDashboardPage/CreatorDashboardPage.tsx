@@ -148,74 +148,18 @@ const CreatorDashboardPage: React.FC = () => {
       <DashboardNav />
       
       {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
-      {isCardNotSetUp && (
+      {!dashboardData['is-verified'] && (
         <>
           <VerifyAccountAlert onClick={handleVerifyAccount} />
-          <PayoutAlert onClick={handlePayoutClick} />
-  
-          {/* Test buttons */}
-          <button 
-            onClick={handleTestData}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#ff6b6b',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🧪 Test Data
-          </button>
-          
-          <button 
-            onClick={handleDebugInfo}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#4ecdc4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🔍 Debug WebApp
-          </button>
-          
-          <button 
-            onClick={handleDirectSendData}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#45b7d1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🚀 Direct Send
-          </button>
-          
-          <button 
-            onClick={handleTestDifferentData}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#f39c12',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🧪 Test Multiple
-          </button>
         </>
       )}
-      
+      {isCardNotSetUp && (
+        <>
+          <PayoutAlert onClick={handlePayoutClick} />        
+        </>
+      )}
+
+
       {dashboardData['channels-and-groups'].length === 0 && (
         <GettingStarted />
       )}
