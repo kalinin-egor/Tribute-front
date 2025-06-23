@@ -52,6 +52,26 @@ const CreatorDashboardPage: React.FC = () => {
     console.log('window.Telegram.WebApp:', window.Telegram?.WebApp);
     console.log('window.Telegram.WebApp.sendData:', window.Telegram?.WebApp?.sendData);
     
+    // Логируем все доступные методы и свойства WebApp
+    if (window.Telegram?.WebApp) {
+      const webApp = window.Telegram.WebApp;
+      const methods = Object.getOwnPropertyNames(webApp).filter(name => typeof webApp[name] === 'function');
+      const properties = Object.getOwnPropertyNames(webApp).filter(name => typeof webApp[name] !== 'function');
+      
+      console.log('🔍 WebApp methods:', methods);
+      console.log('🔍 WebApp properties:', properties);
+      await sendLogToBot(`🔍 WebApp methods: ${methods.join(', ')}`);
+      await sendLogToBot(`🔍 WebApp properties: ${properties.join(', ')}`);
+      
+      // Логируем прототип для полной картины
+      const prototype = Object.getPrototypeOf(webApp);
+      if (prototype) {
+        const protoMethods = Object.getOwnPropertyNames(prototype).filter(name => typeof prototype[name] === 'function');
+        console.log('🔍 WebApp prototype methods:', protoMethods);
+        await sendLogToBot(`🔍 WebApp prototype methods: ${protoMethods.join(', ')}`);
+      }
+    }
+    
     await sendLogToBot(`window.Telegram: ${!!window.Telegram}`);
     await sendLogToBot(`window.Telegram.WebApp: ${!!window.Telegram?.WebApp}`);
     await sendLogToBot(`window.Telegram.WebApp.sendData: ${!!window.Telegram?.WebApp?.sendData}`);
@@ -59,10 +79,30 @@ const CreatorDashboardPage: React.FC = () => {
     if (window.Telegram && window.Telegram.WebApp) {
       await sendLogToBot('✅ Calling window.Telegram.WebApp.sendData("verify-account")');
       console.log('✅ Calling window.Telegram.WebApp.sendData("verify-account")');
+      
       try {
-        window.Telegram.WebApp.sendData('verify-account');
+        // Попробуем получить результат sendData
+        const result = window.Telegram.WebApp.sendData('verify-account');
+        console.log('📤 sendData result:', result);
+        await sendLogToBot(`📤 sendData result: ${JSON.stringify(result)}`);
+        
+        // Проверим, есть ли какие-то свойства у результата
+        if (result !== undefined) {
+          console.log('📤 sendData result type:', typeof result);
+          console.log('📤 sendData result keys:', Object.keys(result || {}));
+          await sendLogToBot(`📤 sendData result type: ${typeof result}`);
+          await sendLogToBot(`📤 sendData result keys: ${Object.keys(result || {}).join(', ')}`);
+        }
+        
         await sendLogToBot('✅ sendData called successfully');
         console.log('✅ sendData called successfully');
+        
+        // Попробуем проверить, есть ли какие-то события после sendData
+        setTimeout(async () => {
+          await sendLogToBot('⏰ 1 second after sendData - checking for any callbacks or events');
+          console.log('⏰ 1 second after sendData - checking for any callbacks or events');
+        }, 1000);
+        
       } catch (error) {
         const errorMsg = `❌ Error calling sendData: ${error}`;
         await sendLogToBot(errorMsg);
@@ -123,7 +163,17 @@ const CreatorDashboardPage: React.FC = () => {
                 await sendLogToBot('🧪 Calling sendData from test button');
                 console.log('🧪 Calling sendData from test button');
                 try {
-                  window.Telegram.WebApp.sendData('test-data');
+                  const result = window.Telegram.WebApp.sendData('test-data');
+                  console.log('🧪 Test sendData result:', result);
+                  await sendLogToBot(`🧪 Test sendData result: ${JSON.stringify(result)}`);
+                  
+                  if (result !== undefined) {
+                    console.log('🧪 Test sendData result type:', typeof result);
+                    console.log('🧪 Test sendData result keys:', Object.keys(result || {}));
+                    await sendLogToBot(`🧪 Test sendData result type: ${typeof result}`);
+                    await sendLogToBot(`🧪 Test sendData result keys: ${Object.keys(result || {}).join(', ')}`);
+                  }
+                  
                   await sendLogToBot('🧪 Test sendData called successfully');
                 } catch (error) {
                   await sendLogToBot(`🧪 Test sendData error: ${error}`);
