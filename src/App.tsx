@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { TelegramProvider } from './Presentation/hooks/useTelegram';
 import { AppStateProvider, useAppState } from './Presentation/hooks/useAppState';
-import { sendLogToTelegram } from './utils/helpers';
+import { isTelegramWebApp, initializeTelegramWebApp, getWebAppInfo } from './utils/helpers';
 import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
@@ -22,70 +22,63 @@ declare global {
 function AppContent() {
   const { isLoading, error, isOnboarded } = useAppState();
 
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
-    // Проверка и инициализация Telegram WebApp
-    if (window.Telegram?.WebApp) {
+    const initializeApp = async () => {
       console.log('🔧 Initializing Telegram WebApp...');
-      sendLogToTelegram('🚀 Начало инициализации Telegram WebApp');
       
-      try {
-        // Проверяем доступность основных методов
-        if (typeof window.Telegram.WebApp.ready === 'function') {
-          window.Telegram.WebApp.ready();
-          console.log('✅ WebApp.ready() called');
-          sendLogToTelegram('✅ WebApp.ready() вызван');
-        }
-        
-        if (typeof window.Telegram.WebApp.expand === 'function') {
-          window.Telegram.WebApp.expand();
-          console.log('✅ WebApp.expand() called');
-          sendLogToTelegram('✅ WebApp.expand() вызван');
-        }
-        
-        if (typeof window.Telegram.WebApp.setHeaderColor === 'function') {
-          window.Telegram.WebApp.setHeaderColor('#ffffff');
-          sendLogToTelegram('✅ Цвет заголовка установлен');
-        }
-        
-        if (typeof window.Telegram.WebApp.setBackgroundColor === 'function') {
-          window.Telegram.WebApp.setBackgroundColor('#f2f2f2');
-          sendLogToTelegram('✅ Цвет фона установлен');
-        }
-        
-        // Проверяем доступность sendData
-        if (typeof window.Telegram.WebApp.sendData === 'function') {
-          console.log('✅ sendData method is available');
-          sendLogToTelegram('✅ sendData метод доступен');
-        } else {
-          console.warn('⚠️ sendData method is not available');
-          sendLogToTelegram('⚠️ sendData метод недоступен');
-        }
-        
-        console.log('✅ Telegram WebApp initialized successfully');
-        sendLogToTelegram('✅ Telegram WebApp успешно инициализирован');
-        
-        // Дополнительная проверка состояния после инициализации
-        setTimeout(async () => {
-          await sendLogToTelegram('🔍 Проверка состояния WebApp после инициализации...');
+      if (isTelegramWebApp()) {
+        try {
+          const webApp = window.Telegram.WebApp;
           
-          if (window.Telegram?.WebApp) {
-            const webApp = window.Telegram.WebApp;
-            await sendLogToTelegram(`📱 isExpanded: ${webApp.isExpanded}`);
-            await sendLogToTelegram(`📏 viewportHeight: ${webApp.viewportHeight}`);
-            await sendLogToTelegram(`🎨 colorScheme: ${webApp.colorScheme}`);
-            await sendLogToTelegram(`📊 initData length: ${webApp.initData ? webApp.initData.length : 0}`);
-            await sendLogToTelegram(`👤 User: ${webApp.initDataUnsafe?.user ? 'present' : 'missing'}`);
+          // Вызываем ready() для уведомления Telegram о готовности
+          if (typeof webApp.ready === 'function') {
+            webApp.ready();
+            console.log('✅ WebApp.ready() called');
           }
-        }, 1000);
-      } catch (error: any) {
-        const errorMsg = `❌ Error initializing Telegram WebApp: ${error?.message || error}`;
-        console.error(errorMsg);
-        sendLogToTelegram(errorMsg);
+          
+          // Расширяем WebApp на весь экран
+          if (typeof webApp.expand === 'function') {
+            webApp.expand();
+            console.log('✅ WebApp.expand() called');
+          }
+          
+          // Устанавливаем цвет заголовка
+          if (typeof webApp.setHeaderColor === 'function') {
+            webApp.setHeaderColor('#ffffff');
+          }
+          
+          // Устанавливаем цвет фона
+          if (typeof webApp.setBackgroundColor === 'function') {
+            webApp.setBackgroundColor('#f2f2f2');
+          }
+          
+          // Проверяем доступность sendData
+          if (typeof webApp.sendData === 'function') {
+            console.log('✅ sendData method is available');
+          } else {
+            console.warn('⚠️ sendData method is not available');
+          }
+          
+          console.log('✅ Telegram WebApp initialized successfully');
+          
+          // Дополнительная проверка состояния WebApp
+          const info = getWebAppInfo();
+          console.log('WebApp Info:', info);
+          
+        } catch (error: any) {
+          const errorMsg = `❌ Error initializing Telegram WebApp: ${error?.message || error}`;
+          console.error(errorMsg);
+        }
+      } else {
+        console.log('⚠️ Telegram WebApp not available - running in browser mode');
       }
-    } else {
-      console.log('⚠️ Telegram WebApp not available - running in browser mode');
-      sendLogToTelegram('⚠️ Telegram WebApp недоступен - запущено в режиме браузера');
-    }
+      
+      setIsInitialized(true);
+    };
+
+    initializeApp();
   }, []);
 
   if (isLoading) {

@@ -13,9 +13,13 @@ const SetUpPayoutsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
     if (!cardNumber.trim()) {
       setError('Пожалуйста, введите номер карты');
+      setIsSubmitting(false);
       return;
     }
 
@@ -23,29 +27,29 @@ const SetUpPayoutsPage: React.FC = () => {
     const cardNumberRegex = /^\d{16}$/;
     if (!cardNumberRegex.test(cardNumber.replace(/\s/g, ''))) {
       setError('Номер карты должен содержать 16 цифр');
+      setIsSubmitting(false);
       return;
     }
 
-    setIsSubmitting(true);
     setError('');
 
     try {
       const response = await tributeApiService.setUpPayouts({
-        'card-number': cardNumber.replace(/\s/g, '')
+        card_number: cardNumber.replace(/\s/g, ''),
+        expiry_date: expiryDate,
+        cvv: cvv,
+        cardholder_name: cardholderName,
       });
 
-      console.log('✅ Payout setup successful:', response);
-      
-      // Refresh dashboard data to get updated card_number
-      await refreshDashboard();
-      
-      // Show success message
-      alert('Способ выплат успешно настроен!');
-      
-      // Navigate back to dashboard
-      navigate('/dashboard');
+      if (response.success) {
+        await refreshDashboard();
+        alert('Способ выплат успешно настроен!');
+        navigate('/dashboard');
+      } else {
+        setError(response.message || 'Failed to set up payouts');
+      }
     } catch (error: any) {
-      console.error('❌ Error setting up payouts:', error);
+      console.error('Error setting up payouts:', error);
       // Если ошибка 403, показать текст ошибки от сервера под полем ввода
       if (error && error.message && error.message.includes('403')) {
         // Попробуем извлечь текст ошибки из error.message

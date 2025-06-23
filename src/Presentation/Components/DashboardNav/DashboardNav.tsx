@@ -17,16 +17,22 @@ const DashboardNav: React.FC = () => {
         navigate('/set-up-payouts');
         break;
       case 'statistics':
-        // TODO: Navigate to statistics page
-        console.log('Statistics clicked');
+        handleStatisticsClick();
         break;
       case 'more':
-        // TODO: Show more options
-        console.log('More clicked');
+        handleMoreClick();
         break;
       default:
         break;
     }
+  };
+
+  const handleStatisticsClick = () => {
+    // TODO: Implement statistics navigation
+  };
+
+  const handleMoreClick = () => {
+    // TODO: Implement more options
   };
 
   return (

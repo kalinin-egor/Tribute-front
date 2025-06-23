@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { useTelegram } from '../../hooks/useTelegram';
@@ -6,7 +6,6 @@ import {
   sendDataToTelegram, 
   getWebAppInfo, 
   isTelegramWebApp, 
-  sendLogToTelegram, 
   sendDebugInfoToTelegram 
 } from '../../../utils/helpers';
 import styles from './CreatorDashboardPage.module.css';
@@ -29,99 +28,92 @@ const CreatorDashboardPage: React.FC = () => {
   };
 
   // Функция для отправки verify-account
-  const handleVerifyClick = async () => {
-    await sendLogToTelegram('🔄 Нажата кнопка Verify Account');
-    const success = await sendDataToTelegram('verify-account');
-    if (success) {
-      await sendLogToTelegram('✅ verify-account отправлен успешно');
-    } else {
-      await sendLogToTelegram('❌ Не удалось отправить verify-account');
+  const handleVerifyAccount = async () => {
+    try {
+      const success = await sendDataToTelegram('verify-account');
+      if (success) {
+        console.log('✅ verify-account отправлен успешно');
+      } else {
+        console.log('❌ Не удалось отправить verify-account');
+      }
+    } catch (error) {
+      console.error('Error sending verify-account:', error);
     }
   };
 
   // Функция для отправки test-data
   const handleTestData = async () => {
-    await sendLogToTelegram('🔄 Нажата кнопка Test Data');
-    const success = await sendDataToTelegram('test-data');
-    if (success) {
-      await sendLogToTelegram('✅ test-data отправлен успешно');
-    } else {
-      await sendLogToTelegram('❌ Не удалось отправить test-data');
+    try {
+      const success = await sendDataToTelegram('test-data');
+      if (success) {
+        console.log('✅ test-data отправлен успешно');
+      } else {
+        console.log('❌ Не удалось отправить test-data');
+      }
+    } catch (error) {
+      console.error('Error sending test-data:', error);
     }
   };
 
   // Функция для отладки WebApp
-  const debugWebApp = async () => {
-    await sendLogToTelegram('🔍 Запрошена отладочная информация');
-    
-    console.log('🔍 Debugging WebApp state:');
-    console.log('isTelegramWebApp:', isTelegramWebApp());
-    console.log('WebApp Info:', getWebAppInfo());
-    console.log('window.Telegram:', window.Telegram);
-    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
-    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
-    console.log('typeof sendData:', typeof window.Telegram?.WebApp?.sendData);
-    
-    if (window.Telegram?.WebApp) {
-      console.log('WebApp.initData:', window.Telegram.WebApp.initData ? 'present' : 'missing');
-      console.log('WebApp.initDataUnsafe:', window.Telegram.WebApp.initDataUnsafe);
-      console.log('WebApp.version:', window.Telegram.WebApp.version);
-      console.log('WebApp.platform:', window.Telegram.WebApp.platform);
-    }
-    
-    // Отправляем подробную отладочную информацию в Telegram
+  const handleDebugInfo = async () => {
     await sendDebugInfoToTelegram();
   };
 
   // Функция для прямой отправки данных (без проверок)
   const handleDirectSendData = async () => {
-    await sendLogToTelegram('🚀 Прямая отправка данных (без проверок)');
-    
     try {
-      await sendLogToTelegram('📤 Вызываем window.Telegram.WebApp.sendData("direct-test") напрямую...');
+      console.log('🚀 Прямая отправка данных (без проверок)');
       
-      // Прямой вызов без проверок
+      if (!isTelegramWebApp()) {
+        console.error('❌ WebApp недоступен');
+        return;
+      }
+      
+      console.log('📤 Вызываем window.Telegram.WebApp.sendData("direct-test") напрямую...');
+      
       const result = window.Telegram.WebApp.sendData('direct-test');
+      console.log(`✅ Прямой вызов выполнен, результат: ${result}`);
+      console.log('✅ Данные "direct-test" отправлены напрямую');
       
-      await sendLogToTelegram(`✅ Прямой вызов выполнен, результат: ${result}`);
-      await sendLogToTelegram('✅ Данные "direct-test" отправлены напрямую');
-      
-      // Проверяем через 3 секунды
-      setTimeout(async () => {
-        await sendLogToTelegram('⏰ Проверка через 3 секунды: данные "direct-test" должны быть получены ботом');
+      // Дополнительная проверка через небольшую задержку
+      setTimeout(() => {
+        console.log('⏰ Проверка через 3 секунды: данные "direct-test" должны быть получены ботом');
       }, 3000);
       
     } catch (error: any) {
-      await sendLogToTelegram(`❌ Ошибка при прямой отправке: ${error?.message || error}`);
-      await sendLogToTelegram(`🔍 Тип ошибки: ${typeof error}`);
+      console.error(`❌ Ошибка при прямой отправке: ${error?.message || error}`);
+      console.error(`🔍 Тип ошибки: ${typeof error}`);
     }
   };
 
   // Функция для тестирования разных типов данных
   const handleTestDifferentData = async () => {
-    await sendLogToTelegram('🧪 Тестирование разных типов данных');
+    console.log('🧪 Тестирование разных типов данных');
     
     const testData = [
-      'simple-test',
-      '{"action": "test", "data": "json"}',
+      'simple-text',
+      '{"type": "test", "data": "json"}',
       'verify-account',
-      'test-data'
+      'test-data',
+      'custom-action'
     ];
     
     for (const data of testData) {
-      await sendLogToTelegram(`🔄 Тестируем данные: "${data}"`);
       try {
+        console.log(`🔄 Тестируем данные: "${data}"`);
+        
         const result = await window.Telegram.WebApp.sendData(data);
-        await sendLogToTelegram(`✅ "${data}" отправлен, результат: ${result}`);
+        console.log(`✅ "${data}" отправлен, результат: ${result}`);
       } catch (error: any) {
-        await sendLogToTelegram(`❌ Ошибка для "${data}": ${error?.message || error}`);
+        console.error(`❌ Ошибка для "${data}": ${error?.message || error}`);
       }
       
-      // Пауза между отправками
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Небольшая задержка между запросами
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    await sendLogToTelegram('✅ Тестирование завершено');
+    console.log('✅ Тестирование завершено');
   };
 
   if (!dashboardData) {
@@ -158,7 +150,7 @@ const CreatorDashboardPage: React.FC = () => {
       {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
       {isCardNotSetUp && (
         <>
-          <VerifyAccountAlert onClick={handleVerifyClick} />
+          <VerifyAccountAlert onClick={handleVerifyAccount} />
           <PayoutAlert onClick={handlePayoutClick} />
   
           {/* Test buttons */}
@@ -178,7 +170,7 @@ const CreatorDashboardPage: React.FC = () => {
           </button>
           
           <button 
-            onClick={debugWebApp}
+            onClick={handleDebugInfo}
             style={{
               margin: '10px',
               padding: '10px',

@@ -45,106 +45,70 @@ const ChannelsPage: React.FC = () => {
     }
   };
 
-  // Function to check channel ownership
+  const handleAddBotClick = async () => {
+    if (isAddingBot) {
+      return;
+    }
+
+    setIsAddingBot(true);
+    
+    const url = `https://t.me/TributeBot?start=add_bot`;
+    window.open(url, '_blank');
+  };
+
   const checkChannelOwnership = async (channelId: string) => {
     try {
-      console.log('🔍 Checking channel ownership for:', channelId);
       const response = await tributeApiService.checkChannel(channelId);
-      console.log('✅ Channel ownership check result:', response);
-      
-      // Refresh dashboard data to show updated channel status
-      await refreshDashboard();
-      
       return response;
     } catch (error) {
-      console.error('❌ Error checking channel ownership:', error);
+      console.error('Error checking channel ownership:', error);
       return null;
     }
   };
 
-  // Function to get channel list and check for new unverified channels
-  const checkForNewChannels = async () => {
+  const processNewChannels = async () => {
     try {
-      console.log('📋 Checking channel list...');
       const channels = await tributeApiService.getChannelList();
-      console.log('📋 Current channels:', channels);
-      console.log('📋 Number of channels:', channels.length);
       
-      // Find channels with is_verified: false that we haven't checked yet
-      const unverifiedChannels = channels.filter((channel: ChannelDTO) => {
-        const isUnverified = !channel.is_verified;
-        const notChecked = !checkedChannelsRef.current.has(channel.id);
-        console.log(`Channel ${channel.channel_title}: is_verified=${channel.is_verified}, checked=${checkedChannelsRef.current.has(channel.id)}`);
-        return isUnverified && notChecked;
-      });
-      
-      console.log('🔍 Unverified channels found:', unverifiedChannels.length);
+      // Находим непроверенные каналы
+      const unverifiedChannels = channels.filter(channel => !channel.is_verified);
       
       if (unverifiedChannels.length > 0) {
-        console.log('🆕 Found new unverified channels:', unverifiedChannels);
-        
-        // Check ownership for each unverified channel
+        // Проверяем каждый непроверенный канал
         for (const channel of unverifiedChannels) {
-          console.log(`🔍 Checking ownership for channel: ${channel.channel_title} (${channel.id})`);
-          
-          // Add to checked set to avoid duplicate checks
-          checkedChannelsRef.current.add(channel.id);
-          
-          // Check channel ownership
-          await checkChannelOwnership(channel.id);
+          if (!checkedChannelsRef.current.has(channel.id)) {
+            const response = await checkChannelOwnership(channel.id);
+            if (response) {
+              checkedChannelsRef.current.add(channel.id);
+            }
+          }
         }
-        
-        // If we found and processed new channels, stop the polling
-        setIsAddingBot(false);
-        console.log('✅ Channel addition process completed');
-      } else {
-        console.log('📭 No new unverified channels found');
       }
     } catch (error) {
-      console.error('❌ Error checking channel list:', error);
-      console.error('❌ Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
+      console.error('Error processing new channels:', error);
     }
   };
 
-  // Track isAddingBot changes
+  // Эффект для опроса каналов
   useEffect(() => {
-    console.log('🔄 isAddingBot changed to:', isAddingBot);
-  }, [isAddingBot]);
+    let intervalId: NodeJS.Timeout;
+    let timeoutId: NodeJS.Timeout;
 
-  // Poll for new channels when adding bot
-  useEffect(() => {
-    if (!isAddingBot) {
-      console.log('🛑 Polling stopped - isAddingBot is false');
-      return;
+    if (isAddingBot) {
+      // Опрашиваем каждые 2 секунды
+      intervalId = setInterval(() => {
+        processNewChannels();
+      }, 2000);
+
+      // Останавливаем опрос через 30 секунд
+      timeoutId = setTimeout(() => {
+        setIsAddingBot(false);
+      }, 30000);
     }
 
-    console.log('🔄 Starting channel polling...');
-    console.log('📊 Current isAddingBot state:', isAddingBot);
-    
-    // Check immediately
-    checkForNewChannels();
-
-    // Set up interval to check every second
-    const interval = setInterval(() => {
-      console.log('⏰ Polling tick - checking for new channels...');
-      checkForNewChannels();
-    }, 1000);
-
-    // Set up timeout to stop polling after 30 seconds
-    const timeout = setTimeout(() => {
-      if (isAddingBot) {
-        console.log('⏰ Timeout reached, stopping channel polling');
-        setIsAddingBot(false);
-      }
-    }, 30000);
-
     return () => {
-      console.log('🧹 Cleaning up polling interval and timeout');
-      clearInterval(interval);
-      clearTimeout(timeout);
+      if (intervalId) clearInterval(intervalId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [isAddingBot]);
 

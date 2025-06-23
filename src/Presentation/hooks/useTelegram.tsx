@@ -144,67 +144,25 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
       const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isDevelopment) {
         const mockWebApp = {
-          ready: () => console.log('Mock WebApp ready'),
-          expand: () => console.log('Mock WebApp expand'),
-          close: () => console.log('Mock WebApp close'),
+          ready: () => {},
+          expand: () => {},
+          close: () => {},
           sendData: (data: string) => {
-            console.log('Mock WebApp sendData called with:', data);
+            // Mock implementation
           },
-          MainButton: {
-            text: '',
-            color: '',
-            textColor: '',
-            isVisible: false,
-            isActive: false,
-            isProgressVisible: false,
-            setText: () => {},
-            onClick: () => {},
-            offClick: () => {},
-            show: () => {},
-            hide: () => {},
-            enable: () => {},
-            disable: () => {},
-            showProgress: () => {},
-            hideProgress: () => {},
-          },
-          BackButton: {
-            isVisible: false,
-            onClick: () => {},
-            offClick: () => {},
-            show: () => {},
-            hide: () => {},
-          },
-          initData: 'mock-init-data-for-development',
-          openTelegramLink: (url: string) => { console.log('Mock opening TG link:', url) },
-          initDataUnsafe: {
-            user: {
-              id: 123456789,
-              first_name: 'Test',
-              last_name: 'User',
-              username: 'testuser',
-              language_code: 'en',
-            }
-          },
-          colorScheme: 'light' as const,
-          themeParams: {},
+          showPopup: (params: any) => {},
+          showAlert: (message: string) => {},
+          showConfirm: (message: string) => {},
+          openTelegramLink: (url: string) => {},
+          setHeaderColor: (color: string) => {},
+          setBackgroundColor: (color: string) => {},
+          initData: '',
+          initDataUnsafe: {},
+          version: '6.0',
+          platform: 'web',
           isExpanded: false,
-          viewportHeight: 600,
-          viewportStableHeight: 600,
-          headerColor: '#ffffff',
-          backgroundColor: '#ffffff',
-          isClosingConfirmationEnabled: false,
-          HapticFeedback: {
-            impactOccurred: () => {},
-            notificationOccurred: () => {},
-            selectionChanged: () => {},
-          },
-          CloudStorage: {
-            getItem: async () => null,
-            setItem: async () => {},
-            getItems: async () => ({}),
-            removeItem: async () => {},
-            removeItems: async () => {},
-          },
+          viewportHeight: 0,
+          colorScheme: 'light',
         };
         
         setWebApp(mockWebApp as any);

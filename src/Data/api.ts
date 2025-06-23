@@ -32,10 +32,8 @@ class TributeApiService {
   private getAuthHeader(): string | null {
     if (window.Telegram?.WebApp?.initData) {
       const authHeader = `TgAuth ${window.Telegram.WebApp.initData}`;
-      console.log('Auth header generated:', authHeader.substring(0, 50) + '...');
       return authHeader;
     }
-    console.log('No Telegram WebApp or initData available');
     return null;
   }
 
@@ -44,7 +42,6 @@ class TributeApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    console.log('Making API request to:', url);
     
     const authHeader = this.getAuthHeader();
     const defaultHeaders: Record<string, string> = {
@@ -66,28 +63,11 @@ class TributeApiService {
       credentials: 'omit',
     };
 
-    console.log('Request config:', {
-      url,
-      method: config.method || 'GET',
-      headers: config.headers,
-      hasBody: !!config.body,
-      mode: config.mode
-    });
-
     try {
       const response = await fetch(url, config);
-      console.log('Response status:', response.status, response.statusText);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       // Handle 404 specifically for dashboard endpoint
       if (response.status === 404 && endpoint === '/dashboard') {
-        console.log('Dashboard not found - user needs onboarding');
-        console.log('Response details:', {
-          status: response.status,
-          statusText: response.statusText,
-          url: url,
-          endpoint: endpoint
-        });
         throw new NotFoundError('Dashboard not found - user needs onboarding');
       }
       
@@ -98,7 +78,6 @@ class TributeApiService {
       } else {
         data = await response.text();
       }
-      console.log('Response data:', data);
 
       if (!response.ok) {
         const errorMessage = typeof data === 'object' && data.error 
@@ -124,13 +103,11 @@ class TributeApiService {
 
   // Dashboard
   async getDashboard(): Promise<DashboardResponse> {
-    console.log('Getting dashboard data...');
     return this.request<DashboardResponse>('/dashboard');
   }
 
   // Create User
   async createUser(): Promise<CreateUserResponse> {
-    console.log('Creating user...');
     return this.request<CreateUserResponse>('/create-user', {
       method: 'POST',
     });
@@ -149,13 +126,11 @@ class TributeApiService {
 
   // Get Channel List
   async getChannelList(): Promise<ChannelDTO[]> {
-    console.log('Getting channel list...');
     return this.request<ChannelDTO[]>('/channel-list');
   }
 
   // Check Channel Ownership
   async checkChannel(channelId: string): Promise<CheckChannelResponse> {
-    console.log('Checking channel ownership for:', channelId);
     const request: CheckChannelRequest = {
       channel_id: channelId
     };
