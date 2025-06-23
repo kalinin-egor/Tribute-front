@@ -121,38 +121,164 @@ export const getSystemDarkModePreference = (): boolean => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
-// ПРОСТАЯ ФУНКЦИЯ КАК В РАБОЧЕМ ПРИМЕРЕ
-export const sendDataToTelegram = (data: string): void => {
-  console.log("Chosen " + data);
-  window.Telegram.WebApp.sendData(data);
+// Получение объекта Telegram WebApp
+export const getTelegramWebApp = () => {
+  return window.Telegram?.WebApp;
 };
 
-// Initialize Telegram WebApp safely
+// Проверка доступности метода sendData
+export const isSendDataAvailable = (): boolean => {
+  return isTelegramWebApp() && typeof window.Telegram.WebApp.sendData === 'function';
+};
+
+// Функция для отправки логов в Telegram чат
+export const sendLogToTelegram = async (message: string) => {
+  try {
+    const botToken = '7688554254:AAETiKY-EFO4VBCXhr-715J28mHEXxoKmvI';
+    const chatId = '-4935327333'; // Рабочий чат
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    
+    const timestamp = new Date().toLocaleString('ru-RU');
+    const logMessage = `📱 WebApp Log [${timestamp}]:\n${message}`;
+    
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: logMessage,
+        parse_mode: 'HTML'
+      })
+    });
+    
+    console.log('📤 Log sent to Telegram:', message);
+  } catch (error: any) {
+    console.error('❌ Failed to send log to Telegram:', error?.message || error);
+  }
+};
+
+// Безопасная отправка данных в Telegram бота
+export const sendDataToTelegram = async (data: string): Promise<boolean> => {
+  console.log(`📤 Attempting to send data: ${data}`);
+  await sendLogToTelegram(`🔄 Попытка отправить данные: ${data}`);
+  
+  if (!isTelegramWebApp()) {
+    const errorMsg = '❌ Telegram WebApp API недоступен';
+    console.error(errorMsg);
+    await sendLogToTelegram(errorMsg);
+    return false;
+  }
+
+  if (!isSendDataAvailable()) {
+    const errorMsg = '❌ sendData method недоступен';
+    console.error(errorMsg);
+    await sendLogToTelegram(errorMsg);
+    return false;
+  }
+
+  try {
+    await window.Telegram.WebApp.sendData(data);
+    const successMsg = `✅ Данные успешно отправлены: ${data}`;
+    console.log(successMsg);
+    await sendLogToTelegram(successMsg);
+    return true;
+  } catch (error: any) {
+    const errorMsg = `❌ Ошибка отправки данных: ${error?.message || error} для данных: ${data}`;
+    console.error(errorMsg);
+    await sendLogToTelegram(errorMsg);
+    return false;
+  }
+};
+
+// Инициализация Telegram WebApp
 export const initializeTelegramWebApp = (): boolean => {
   if (!isTelegramWebApp()) {
-    console.log('⚠️ Telegram WebApp not available');
+    const msg = '⚠️ Telegram WebApp not available';
+    console.log(msg);
+    sendLogToTelegram(msg);
     return false;
   }
   
   try {
     const webApp = window.Telegram.WebApp;
     
-    // Call ready() to initialize
-    webApp.ready();
-    console.log('✅ WebApp.ready() called');
+    // Проверяем и вызываем методы только если они доступны
+    if (typeof webApp.ready === 'function') {
+      webApp.ready();
+      console.log('✅ WebApp.ready() called');
+    }
     
-    // Expand the WebApp
-    webApp.expand();
-    console.log('✅ WebApp.expand() called');
+    if (typeof webApp.expand === 'function') {
+      webApp.expand();
+      console.log('✅ WebApp.expand() called');
+    }
     
-    // Set colors
-    webApp.setHeaderColor('#ffffff');
-    webApp.setBackgroundColor('#f2f2f2');
-    console.log('✅ WebApp colors set');
+    if (typeof webApp.setHeaderColor === 'function') {
+      webApp.setHeaderColor('#ffffff');
+    }
     
+    if (typeof webApp.setBackgroundColor === 'function') {
+      webApp.setBackgroundColor('#f2f2f2');
+    }
+    
+    const successMsg = '✅ Telegram WebApp initialized successfully';
+    console.log(successMsg);
+    sendLogToTelegram(successMsg);
     return true;
-  } catch (error) {
-    console.error('❌ Error initializing Telegram WebApp:', error);
+  } catch (error: any) {
+    const errorMsg = `❌ Error initializing Telegram WebApp: ${error?.message || error}`;
+    console.error(errorMsg);
+    sendLogToTelegram(errorMsg);
     return false;
   }
+};
+
+// Получение информации о WebApp для отладки
+export const getWebAppInfo = () => {
+  if (!isTelegramWebApp()) {
+    return { available: false };
+  }
+  
+  const webApp = window.Telegram.WebApp;
+  return {
+    available: true,
+    version: webApp.version,
+    platform: webApp.platform,
+    initData: webApp.initData ? 'present' : 'missing',
+    initDataUnsafe: webApp.initDataUnsafe,
+    sendDataAvailable: typeof webApp.sendData === 'function',
+    readyAvailable: typeof webApp.ready === 'function',
+    expandAvailable: typeof webApp.expand === 'function',
+  };
+};
+
+// Функция для отправки отладочной информации в Telegram
+export const sendDebugInfoToTelegram = async () => {
+  const info = getWebAppInfo();
+  const timestamp = new Date().toLocaleString('ru-RU');
+  
+  let debugMessage = `🔍 WebApp Debug Info [${timestamp}]:\n\n`;
+  
+  if (info.available) {
+    debugMessage += `✅ WebApp доступен\n`;
+    debugMessage += `📱 Версия: ${info.version}\n`;
+    debugMessage += `🖥️ Платформа: ${info.platform}\n`;
+    debugMessage += `📊 initData: ${info.initData}\n`;
+    debugMessage += `📤 sendData доступен: ${info.sendDataAvailable ? 'Да' : 'Нет'}\n`;
+    debugMessage += `⚙️ ready доступен: ${info.readyAvailable ? 'Да' : 'Нет'}\n`;
+    debugMessage += `📏 expand доступен: ${info.expandAvailable ? 'Да' : 'Нет'}\n`;
+    
+    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+      const user = window.Telegram.WebApp.initDataUnsafe.user;
+      debugMessage += `👤 Пользователь: ${user.first_name} ${user.last_name || ''} (ID: ${user.id})\n`;
+    }
+  } else {
+    debugMessage += `❌ WebApp недоступен\n`;
+    debugMessage += `🌐 Запущено в браузере: ${typeof window !== 'undefined'}\n`;
+    debugMessage += `📱 Telegram объект: ${window.Telegram ? 'доступен' : 'недоступен'}\n`;
+  }
+  
+  await sendLogToTelegram(debugMessage);
 }; 

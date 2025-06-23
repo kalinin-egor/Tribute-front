@@ -2,6 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { useTelegram } from '../../hooks/useTelegram';
+import { 
+  sendDataToTelegram, 
+  getWebAppInfo, 
+  isTelegramWebApp, 
+  sendLogToTelegram, 
+  sendDebugInfoToTelegram 
+} from '../../../utils/helpers';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
 import EarningsSummary from '../../Components/EarningsSummary/EarningsSummary';
@@ -17,38 +24,54 @@ const CreatorDashboardPage: React.FC = () => {
   const { webApp, isReady } = useTelegram();
   const navigate = useNavigate();
 
-  // Function to send debug logs to Telegram bot
-  const sendLogToBot = async (message: string) => {
-    try {
-      const botToken = '7688554254:AAETiKY-EFO4VBCXhr-715J28mHEXxoKmvI';
-      const chatId = '-4935327333';
-      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-      
-      await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: `🔍 WebApp Debug: ${message}`,
-          parse_mode: 'HTML'
-        })
-      });
-    } catch (error) {
-      console.error('Failed to send log to bot:', error);
-    }
-  };
-
   const handlePayoutClick = () => {
     navigate('/set-up-payouts');
   };
 
-  // ТОЧНО КАК В РАБОЧЕМ КОДЕ
-  const sendData = () => {
-    window.Telegram.WebApp.sendData("verify-account")
-    console.log("Data sent")
-  }
+  // Функция для отправки verify-account
+  const handleVerifyClick = async () => {
+    await sendLogToTelegram('🔄 Нажата кнопка Verify Account');
+    const success = await sendDataToTelegram('verify-account');
+    if (success) {
+      await sendLogToTelegram('✅ verify-account отправлен успешно');
+    } else {
+      await sendLogToTelegram('❌ Не удалось отправить verify-account');
+    }
+  };
+
+  // Функция для отправки test-data
+  const handleTestData = async () => {
+    await sendLogToTelegram('🔄 Нажата кнопка Test Data');
+    const success = await sendDataToTelegram('test-data');
+    if (success) {
+      await sendLogToTelegram('✅ test-data отправлен успешно');
+    } else {
+      await sendLogToTelegram('❌ Не удалось отправить test-data');
+    }
+  };
+
+  // Функция для отладки WebApp
+  const debugWebApp = async () => {
+    await sendLogToTelegram('🔍 Запрошена отладочная информация');
+    
+    console.log('🔍 Debugging WebApp state:');
+    console.log('isTelegramWebApp:', isTelegramWebApp());
+    console.log('WebApp Info:', getWebAppInfo());
+    console.log('window.Telegram:', window.Telegram);
+    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
+    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
+    console.log('typeof sendData:', typeof window.Telegram?.WebApp?.sendData);
+    
+    if (window.Telegram?.WebApp) {
+      console.log('WebApp.initData:', window.Telegram.WebApp.initData ? 'present' : 'missing');
+      console.log('WebApp.initDataUnsafe:', window.Telegram.WebApp.initDataUnsafe);
+      console.log('WebApp.version:', window.Telegram.WebApp.version);
+      console.log('WebApp.platform:', window.Telegram.WebApp.platform);
+    }
+    
+    // Отправляем подробную отладочную информацию в Telegram
+    await sendDebugInfoToTelegram();
+  };
 
   if (!dashboardData) {
     return (
@@ -84,26 +107,38 @@ const CreatorDashboardPage: React.FC = () => {
       {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
       {isCardNotSetUp && (
         <>
-          <VerifyAccountAlert onClick={sendData} />
+          <VerifyAccountAlert onClick={handleVerifyClick} />
           <PayoutAlert onClick={handlePayoutClick} />
   
-          {/* Direct sendData test - ТОЧНО КАК В РАБОЧЕМ КОДЕ */}
+          {/* Test buttons */}
           <button 
-            onClick={() => {
-              window.Telegram.WebApp.sendData('direct-test')
-              console.log("Direct test sent")
-            }}
+            onClick={handleTestData}
             style={{
               margin: '10px',
               padding: '10px',
-              backgroundColor: '#45b7d1',
+              backgroundColor: '#ff6b6b',
               color: 'white',
               border: 'none',
               borderRadius: '5px',
               cursor: 'pointer'
             }}
           >
-            🎯 Direct SendData Test
+            🧪 Test Data
+          </button>
+          
+          <button 
+            onClick={debugWebApp}
+            style={{
+              margin: '10px',
+              padding: '10px',
+              backgroundColor: '#4ecdc4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            🔍 Debug WebApp
           </button>
         </>
       )}
