@@ -25,7 +25,6 @@ export class NotFoundError extends Error {
   }
 }
 
-// Use production API URL
 const API_BASE_URL = 'https://gateway.statgram.org/api/v1';
 
 class TributeApiService {
