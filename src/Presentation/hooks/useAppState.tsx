@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTelegram } from './useTelegram';
 import tributeApiService, { NotFoundError } from '../../Data/api';
 import { DashboardResponse } from '../../Domain/types';
+import { 
+  GetDashboardUseCase, 
+  OnboardUserUseCase,
+  UserRules 
+} from '../../Core';
 
 export interface AppState {
   isLoading: boolean;
@@ -24,6 +29,10 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
   const hasCheckedRef = useRef(false);
   const isCheckingRef = useRef(false);
   
+  // Инициализируем use cases
+  const getDashboardUseCase = new GetDashboardUseCase(tributeApiService);
+  const onboardUserUseCase = new OnboardUserUseCase(tributeApiService);
+  
   const [state, setState] = useState<AppState>({
     isLoading: true,
     isOnboarded: false,
@@ -42,12 +51,16 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const dashboardData = await tributeApiService.getDashboard();
+      // Используем use case вместо прямого вызова API
+      const dashboardData = await getDashboardUseCase.execute();
+      
+      // Используем бизнес-правила для определения состояния
+      const accessRules = UserRules.getDashboardAccessRules(dashboardData);
       
       setState(prev => ({
         ...prev,
         isLoading: false,
-        isOnboarded: true,
+        isOnboarded: accessRules.canAccess,
         dashboardData,
         error: null,
       }));
@@ -76,7 +89,7 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     } finally {
       isCheckingRef.current = false;
     }
-  }, [isReady]);
+  }, [isReady, getDashboardUseCase]);
 
   const refreshDashboard = useCallback(async () => {
     hasCheckedRef.current = false;
@@ -87,7 +100,8 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      await tributeApiService.createUser();
+      // Используем use case для онбординга
+      await onboardUserUseCase.execute();
       await refreshDashboard();
       
     } catch (error: any) {
@@ -98,7 +112,7 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
         error: error.message || 'User creation failed',
       }));
     }
-  }, [refreshDashboard]);
+  }, [refreshDashboard, onboardUserUseCase]);
 
   useEffect(() => {
     if (isReady) {

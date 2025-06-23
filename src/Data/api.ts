@@ -16,6 +16,7 @@ import {
   CheckChannelRequest,
   CheckChannelResponse
 } from '../Domain/types';
+import { TelegramAuthService } from '../Core/services/TelegramAuthService';
 
 // Custom error class for 404 responses
 export class NotFoundError extends Error {
@@ -27,11 +28,10 @@ export class NotFoundError extends Error {
 
 const API_BASE_URL = 'https://gateway.statgram.org/api/v1';
 
-class TributeApiService {
+export class TributeApiService {
   private getAuthHeader(): string | null {
     if (window.Telegram?.WebApp?.initData) {
-      const authHeader = `TgAuth ${window.Telegram.WebApp.initData}`;
-      return authHeader;
+      return TelegramAuthService.getAuthHeader(window.Telegram.WebApp.initData);
     }
     return null;
   }

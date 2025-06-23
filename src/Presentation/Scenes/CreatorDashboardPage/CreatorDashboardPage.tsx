@@ -141,8 +141,7 @@ const CreatorDashboardPage: React.FC = () => {
       />
       
       <EarningsSummary 
-        earnings={dashboardData.earn}
-        isVerified={dashboardData['is-verified']}
+        dashboardData={dashboardData}
       />
       
       <DashboardNav />
