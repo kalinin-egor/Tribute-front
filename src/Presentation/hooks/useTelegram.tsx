@@ -9,6 +9,21 @@ interface TelegramUser {
   photo_url?: string;
 }
 
+export interface TelegramChat {
+  id: number;
+  type: 'group' | 'supergroup' | 'channel';
+  title?: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  photo?: {
+    small_file_id: string;
+    small_file_unique_id: string;
+    big_file_id: string;
+    big_file_unique_id: string;
+  };
+}
+
 interface TelegramWebApp {
   ready: () => void;
   expand: () => void;
@@ -43,7 +58,7 @@ interface TelegramWebApp {
     query_id?: string;
     user?: TelegramUser;
     receiver?: TelegramUser;
-    chat?: any;
+    chat?: TelegramChat;
     chat_type?: string;
     chat_instance?: string;
     start_param?: string;

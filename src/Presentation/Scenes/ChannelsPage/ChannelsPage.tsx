@@ -17,6 +17,11 @@ const ChannelsPage: React.FC = () => {
   const [isAddingBot, setIsAddingBot] = useState(false);
 
   const handleSelectChannel = async () => {
+    // Prevent multiple calls while adding bot
+    if (isAddingBot) {
+      return;
+    }
+
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
     const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
     
@@ -28,19 +33,6 @@ const ChannelsPage: React.FC = () => {
       } else {
         window.open(url, '_blank');
       }
-      
-      // Даем пользователю время добавить бота, затем запрашиваем username
-      setTimeout(() => {
-        const channelUsername = prompt('Введите username канала, в который вы добавили бота (например: @my_channel):');
-        
-        if (channelUsername) {
-          // Убираем @ если пользователь его ввел
-          const cleanUsername = channelUsername.startsWith('@') ? channelUsername.slice(1) : channelUsername;
-          addBotToChannel(cleanUsername);
-        } else {
-          setIsAddingBot(false);
-        }
-      }, 3000);
     } catch (error) {
       console.error('Error opening bot link:', error);
       alert('Ошибка при открытии ссылки на бота');
@@ -58,11 +50,54 @@ const ChannelsPage: React.FC = () => {
       await refreshDashboard();
       
       alert('Бот успешно добавлен в канал!');
+      setIsAddingBot(false);
     } catch (error) {
       console.error('Error adding bot to channel:', error);
       alert('Ошибка при добавлении бота в канал. Попробуйте еще раз.');
+      setIsAddingBot(false);
     }
   };
+
+  // Listen for chat changes when user returns from adding bot
+  useEffect(() => {
+    if (!webApp) return;
+
+    const checkForChatData = () => {
+      if (webApp.initDataUnsafe?.chat && isAddingBot) {
+        const chat = webApp.initDataUnsafe.chat;
+        console.log('Chat data received:', chat);
+        
+        // Extract username from chat data
+        if (chat.username) {
+          addBotToChannel(chat.username);
+        } else if (chat.title) {
+          // If no username, we might need to handle this differently
+          console.log('No username found in chat data, using title:', chat.title);
+          // For now, we'll still try to add the bot, but this might need adjustment
+          addBotToChannel(chat.title.toLowerCase().replace(/\s+/g, '_'));
+        }
+      }
+    };
+
+    // Check immediately in case data is already available
+    checkForChatData();
+
+    // Set up an interval to check for chat data changes
+    const interval = setInterval(checkForChatData, 1000);
+
+    // Set up a timeout to reset the adding state if no chat data is received
+    const timeout = setTimeout(() => {
+      if (isAddingBot) {
+        console.log('Timeout reached, resetting adding state');
+        setIsAddingBot(false);
+      }
+    }, 30000); // 30 seconds timeout
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [webApp, isAddingBot]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {
