@@ -139,6 +139,14 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
       console.log('initDataUnsafe:', tg.initDataUnsafe);
       console.log('sendData function:', tg.sendData);
       
+      // Ensure WebApp is ready before using it
+      try {
+        tg.ready();
+        console.log('✅ WebApp.ready() called in provider');
+      } catch (error) {
+        console.error('❌ Error calling WebApp.ready():', error);
+      }
+      
       setWebApp(tg);
       
       if (tg.initDataUnsafe?.user) {
@@ -162,7 +170,13 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
           ready: () => console.log('Mock WebApp ready'),
           expand: () => console.log('Mock WebApp expand'),
           close: () => console.log('Mock WebApp close'),
-          sendData: (data: string) => console.log('Mock WebApp sendData called with:', data),
+          sendData: (data: string) => {
+            console.log('Mock WebApp sendData called with:', data);
+            // In development, we can also try to send to a test bot
+            if (data === 'test-data' || data === 'verify-account') {
+              console.log('📤 Development: Would send data to bot:', data);
+            }
+          },
           MainButton: {
             text: '',
             color: '',

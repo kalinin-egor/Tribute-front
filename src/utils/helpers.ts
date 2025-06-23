@@ -119,4 +119,74 @@ export const toggleDarkMode = (): void => {
 export const getSystemDarkModePreference = (): boolean => {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+
+// Safe function to send data to Telegram bot
+export const sendDataToTelegram = (data: string, webApp?: any): boolean => {
+  console.log(`📤 Attempting to send data: ${data}`);
+  
+  try {
+    // First try using the webApp object from useTelegram hook
+    if (webApp && typeof webApp.sendData === 'function') {
+      webApp.sendData(data);
+      console.log('✅ Data sent successfully via webApp object');
+      return true;
+    }
+    
+    // Fallback to direct window access
+    if (window.Telegram?.WebApp?.sendData) {
+      window.Telegram.WebApp.sendData(data);
+      console.log('✅ Data sent successfully via window.Telegram.WebApp');
+      return true;
+    }
+    
+    console.error('❌ No valid sendData method found');
+    return false;
+    
+  } catch (error) {
+    console.error('❌ Error sending data to Telegram:', error);
+    
+    // Try fallback method
+    try {
+      if (window.Telegram?.WebApp?.sendData) {
+        window.Telegram.WebApp.sendData(data);
+        console.log('✅ Data sent successfully via fallback method');
+        return true;
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback method also failed:', fallbackError);
+    }
+    
+    return false;
+  }
+};
+
+// Initialize Telegram WebApp safely
+export const initializeTelegramWebApp = (): boolean => {
+  if (!isTelegramWebApp()) {
+    console.log('⚠️ Telegram WebApp not available');
+    return false;
+  }
+  
+  try {
+    const webApp = window.Telegram.WebApp;
+    
+    // Call ready() to initialize
+    webApp.ready();
+    console.log('✅ WebApp.ready() called');
+    
+    // Expand the WebApp
+    webApp.expand();
+    console.log('✅ WebApp.expand() called');
+    
+    // Set colors
+    webApp.setHeaderColor('#ffffff');
+    webApp.setBackgroundColor('#f2f2f2');
+    console.log('✅ WebApp colors set');
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Error initializing Telegram WebApp:', error);
+    return false;
+  }
 }; 

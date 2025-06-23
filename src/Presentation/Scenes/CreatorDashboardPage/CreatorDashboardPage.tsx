@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { useTelegram } from '../../hooks/useTelegram';
+import { sendDataToTelegram } from '../../../utils/helpers';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
 import EarningsSummary from '../../Components/EarningsSummary/EarningsSummary';
@@ -14,7 +15,7 @@ import TransactionsPlaceholder from '../../Components/TransactionsPlaceholder/Tr
 
 const CreatorDashboardPage: React.FC = () => {
   const { dashboardData, refreshDashboard } = useAppState();
-  const { webApp } = useTelegram();
+  const { webApp, isReady } = useTelegram();
   const navigate = useNavigate();
 
   // Function to send debug logs to Telegram bot
@@ -46,7 +47,37 @@ const CreatorDashboardPage: React.FC = () => {
 
   const handleVerifyClick = () => {
     console.log("Chosen verify-account");
-    window.Telegram.WebApp.sendData('verify-account');
+    const success = sendDataToTelegram('verify-account', webApp);
+    if (success) {
+      console.log('✅ verify-account data sent successfully');
+    } else {
+      console.error('❌ Failed to send verify-account data');
+    }
+  };
+
+  const handleTestSendData = () => {
+    console.log("Chosen test-data");
+    const success = sendDataToTelegram('test-data', webApp);
+    if (success) {
+      console.log('✅ test-data sent successfully');
+    } else {
+      console.error('❌ Failed to send test-data');
+    }
+  };
+
+  const handleDebugWebApp = () => {
+    console.log('🔍 Debugging WebApp state:');
+    console.log('webApp object:', webApp);
+    console.log('isReady:', isReady);
+    console.log('window.Telegram:', window.Telegram);
+    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
+    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
+    
+    if (webApp) {
+      console.log('webApp.sendData function:', typeof webApp.sendData);
+      console.log('webApp.initData:', webApp.initData ? 'present' : 'missing');
+      console.log('webApp.initDataUnsafe:', webApp.initDataUnsafe);
+    }
   };
 
   if (!dashboardData) {
@@ -88,10 +119,7 @@ const CreatorDashboardPage: React.FC = () => {
           
           {/* Test button for debugging */}
           <button 
-            onClick={() => {
-              console.log("Chosen test-data");
-              window.Telegram.WebApp.sendData('test-data');
-            }}
+            onClick={handleTestSendData}
             style={{
               margin: '10px',
               padding: '10px',
@@ -103,6 +131,50 @@ const CreatorDashboardPage: React.FC = () => {
             }}
           >
             🧪 Test SendData
+          </button>
+          
+          {/* Debug button */}
+          <button 
+            onClick={handleDebugWebApp}
+            style={{
+              margin: '10px',
+              padding: '10px',
+              backgroundColor: '#4ecdc4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            🔍 Debug WebApp
+          </button>
+          
+          {/* Direct sendData test */}
+          <button 
+            onClick={() => {
+              console.log('🔧 Testing direct sendData call...');
+              if (window.Telegram?.WebApp?.sendData) {
+                try {
+                  window.Telegram.WebApp.sendData('direct-test');
+                  console.log('✅ Direct sendData call successful');
+                } catch (error) {
+                  console.error('❌ Direct sendData call failed:', error);
+                }
+              } else {
+                console.error('❌ Direct sendData not available');
+              }
+            }}
+            style={{
+              margin: '10px',
+              padding: '10px',
+              backgroundColor: '#45b7d1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            🎯 Direct SendData Test
           </button>
         </>
       )}
