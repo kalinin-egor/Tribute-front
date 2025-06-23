@@ -72,6 +72,8 @@ export interface DashboardResponse {
 export interface ChannelDTO {
   id: string;
   channel_username: string;
+  channel_title: string;
+  is_verified: boolean;
 }
 
 // Subscription types
@@ -231,4 +233,13 @@ export interface DashboardData {
   subscriptions: Subscription[];
   'is-sub-published': boolean;
   'payments-history': Payment[];
+}
+
+// Check Channel Request/Response
+export interface CheckChannelRequest {
+  channel_id: string;
+}
+
+export interface CheckChannelResponse {
+  is_owner: boolean;
 } 

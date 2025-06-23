@@ -11,7 +11,10 @@ import {
   MessageResponse,
   StatusResponse,
   TelegramUpdate,
-  ErrorResponse
+  ErrorResponse,
+  ChannelDTO,
+  CheckChannelRequest,
+  CheckChannelResponse
 } from '../Domain/types';
 
 // Custom error class for 404 responses
@@ -139,6 +142,24 @@ class TributeApiService {
       'channel-username': channelUsername
     };
     return this.request<AddBotResponse>('/add-bot', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  // Get Channel List
+  async getChannelList(): Promise<ChannelDTO[]> {
+    console.log('Getting channel list...');
+    return this.request<ChannelDTO[]>('/channel-list');
+  }
+
+  // Check Channel Ownership
+  async checkChannel(channelId: string): Promise<CheckChannelResponse> {
+    console.log('Checking channel ownership for:', channelId);
+    const request: CheckChannelRequest = {
+      channel_id: channelId
+    };
+    return this.request<CheckChannelResponse>('/check-channel', {
       method: 'POST',
       body: JSON.stringify(request),
     });

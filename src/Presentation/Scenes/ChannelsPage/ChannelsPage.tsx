@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaChevronRight } from 'react-icons/fa';
 import { useTelegram } from '../../hooks/useTelegram';
 import tributeApiService from '../../../Data/api';
+import { ChannelDTO } from '../../../Domain/types';
 import styles from './ChannelsPage.module.css';
 import duckImage from '../../../assets/images/misunderstood-duck.png';
 
@@ -15,6 +16,7 @@ const ChannelsPage: React.FC = () => {
   const { webApp } = useTelegram();
   const navigate = useNavigate();
   const [isAddingBot, setIsAddingBot] = useState(false);
+  const [checkedChannels, setCheckedChannels] = useState<Set<string>>(new Set());
 
   const handleSelectChannel = async () => {
     // Prevent multiple calls while adding bot
@@ -23,9 +25,10 @@ const ChannelsPage: React.FC = () => {
     }
 
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
-    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages`;
+    const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages&start=add_channel`;
     
     setIsAddingBot(true);
+    console.log('🔗 Opening bot link with URL:', url);
 
     try {
       if (webApp) {
@@ -34,70 +37,89 @@ const ChannelsPage: React.FC = () => {
         window.open(url, '_blank');
       }
     } catch (error) {
-      console.error('Error opening bot link:', error);
+      console.error('❌ Error opening bot link:', error);
       alert('Ошибка при открытии ссылки на бота');
       setIsAddingBot(false);
     }
   };
 
-  // Function to add bot to channel
-  const addBotToChannel = async (channelUsername: string) => {
+  // Function to check channel ownership
+  const checkChannelOwnership = async (channelId: string) => {
     try {
-      const response = await tributeApiService.addBot(channelUsername);
-      console.log('Bot added to channel:', response);
+      console.log('🔍 Checking channel ownership for:', channelId);
+      const response = await tributeApiService.checkChannel(channelId);
+      console.log('✅ Channel ownership check result:', response);
       
-      // Refresh dashboard data to show the new channel
+      // Refresh dashboard data to show updated channel status
       await refreshDashboard();
       
-      alert('Бот успешно добавлен в канал!');
-      setIsAddingBot(false);
+      return response;
     } catch (error) {
-      console.error('Error adding bot to channel:', error);
-      alert('Ошибка при добавлении бота в канал. Попробуйте еще раз.');
-      setIsAddingBot(false);
+      console.error('❌ Error checking channel ownership:', error);
+      return null;
     }
   };
 
-  // Listen for chat changes when user returns from adding bot
-  useEffect(() => {
-    if (!webApp) return;
-
-    const checkForChatData = () => {
-      if (webApp.initDataUnsafe?.chat && isAddingBot) {
-        const chat = webApp.initDataUnsafe.chat;
-        console.log('Chat data received:', chat);
+  // Function to get channel list and check for new unverified channels
+  const checkForNewChannels = async () => {
+    try {
+      console.log('📋 Checking channel list...');
+      const channels = await tributeApiService.getChannelList();
+      console.log('📋 Current channels:', channels);
+      
+      // Find channels with is_verified: false that we haven't checked yet
+      const unverifiedChannels = channels.filter((channel: ChannelDTO) => 
+        !channel.is_verified && !checkedChannels.has(channel.id)
+      );
+      
+      if (unverifiedChannels.length > 0) {
+        console.log('🆕 Found new unverified channels:', unverifiedChannels);
         
-        // Extract username from chat data
-        if (chat.username) {
-          addBotToChannel(chat.username);
-        } else if (chat.title) {
-          // If no username, we might need to handle this differently
-          console.log('No username found in chat data, using title:', chat.title);
-          // For now, we'll still try to add the bot, but this might need adjustment
-          addBotToChannel(chat.title.toLowerCase().replace(/\s+/g, '_'));
+        // Check ownership for each unverified channel
+        for (const channel of unverifiedChannels) {
+          console.log(`🔍 Checking ownership for channel: ${channel.channel_title} (${channel.id})`);
+          
+          // Add to checked set to avoid duplicate checks
+          setCheckedChannels(prev => new Set(Array.from(prev).concat(channel.id)));
+          
+          // Check channel ownership
+          await checkChannelOwnership(channel.id);
         }
+        
+        // If we found and processed new channels, stop the polling
+        setIsAddingBot(false);
+        console.log('✅ Channel addition process completed');
       }
-    };
+    } catch (error) {
+      console.error('❌ Error checking channel list:', error);
+    }
+  };
 
-    // Check immediately in case data is already available
-    checkForChatData();
+  // Poll for new channels when adding bot
+  useEffect(() => {
+    if (!isAddingBot) return;
 
-    // Set up an interval to check for chat data changes
-    const interval = setInterval(checkForChatData, 1000);
+    console.log('🔄 Starting channel polling...');
+    
+    // Check immediately
+    checkForNewChannels();
 
-    // Set up a timeout to reset the adding state if no chat data is received
+    // Set up interval to check every second
+    const interval = setInterval(checkForNewChannels, 1000);
+
+    // Set up timeout to stop polling after 30 seconds
     const timeout = setTimeout(() => {
       if (isAddingBot) {
-        console.log('Timeout reached, resetting adding state');
+        console.log('⏰ Timeout reached, stopping channel polling');
         setIsAddingBot(false);
       }
-    }, 30000); // 30 seconds timeout
+    }, 30000);
 
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [webApp, isAddingBot]);
+  }, [isAddingBot, checkedChannels]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {
