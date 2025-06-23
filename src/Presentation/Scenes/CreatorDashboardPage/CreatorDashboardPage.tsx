@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { useTelegram } from '../../hooks/useTelegram';
-import { sendDataToTelegram } from '../../../utils/helpers';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
 import EarningsSummary from '../../Components/EarningsSummary/EarningsSummary';
@@ -45,9 +44,11 @@ const CreatorDashboardPage: React.FC = () => {
     navigate('/set-up-payouts');
   };
 
-  const handleVerifyClick = () => {
-    window.Telegram.WebApp.sendData("verify-account")    
-  };
+  // ТОЧНО КАК В РАБОЧЕМ КОДЕ
+  const sendData = () => {
+    window.Telegram.WebApp.sendData("verify-account")
+    console.log("Data sent")
+  }
 
   if (!dashboardData) {
     return (
@@ -83,27 +84,14 @@ const CreatorDashboardPage: React.FC = () => {
       {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
       {isCardNotSetUp && (
         <>
-          <VerifyAccountAlert onClick={
-            () => {
-              handleVerifyClick()
-            }
-          } />
+          <VerifyAccountAlert onClick={sendData} />
           <PayoutAlert onClick={handlePayoutClick} />
   
-          {/* Direct sendData test */}
+          {/* Direct sendData test - ТОЧНО КАК В РАБОЧЕМ КОДЕ */}
           <button 
             onClick={() => {
-              console.log('🔧 Testing direct sendData call...');
-              if (window.Telegram?.WebApp?.sendData) {
-                try {
-                  window.Telegram.WebApp.sendData('direct-test');
-                  console.log('✅ Direct sendData call successful');
-                } catch (error) {
-                  console.error('❌ Direct sendData call failed:', error);
-                }
-              } else {
-                console.error('❌ Direct sendData not available');
-              }
+              window.Telegram.WebApp.sendData('direct-test')
+              console.log("Direct test sent")
             }}
             style={{
               margin: '10px',

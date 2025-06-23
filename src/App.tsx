@@ -21,16 +21,6 @@ declare global {
 function AppContent() {
   const { isLoading, error, isOnboarded } = useAppState();
 
-  useEffect(() => {
-    // ПРОСТАЯ ИНИЦИАЛИЗАЦИЯ КАК В РАБОЧЕМ ПРИМЕРЕ
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
-      window.Telegram.WebApp.setHeaderColor('#ffffff');
-      window.Telegram.WebApp.setBackgroundColor('#f2f2f2');
-    }
-  }, []);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

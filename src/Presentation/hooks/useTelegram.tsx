@@ -127,40 +127,28 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
   const [themeParams, setThemeParams] = useState<TelegramWebApp['themeParams']>({});
 
   useEffect(() => {
-    console.log('🔍 TelegramProvider useEffect - checking for Telegram WebApp');
-    
+    // ПРОСТАЯ ИНИЦИАЛИЗАЦИЯ КАК В РАБОЧЕМ КОДЕ
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      console.log('✅ Telegram WebApp found');
-      
-      // НЕ ВЫЗЫВАЕМ ready() ЗДЕСЬ - это делается в App.tsx
       setWebApp(tg);
       
       if (tg.initDataUnsafe?.user) {
-        console.log('User data found:', tg.initDataUnsafe.user);
         setUser(tg.initDataUnsafe.user);
       }
       
       setTheme(tg.colorScheme);
       setThemeParams(tg.themeParams);
       setIsReady(true);
-      console.log('✅ Telegram WebApp initialized successfully');
     } else {
-      console.log('❌ Telegram WebApp not available - running in browser mode');
       // For development, we can simulate Telegram WebApp
       const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isDevelopment) {
-        console.log('🔧 Development mode - simulating Telegram WebApp');
         const mockWebApp = {
           ready: () => console.log('Mock WebApp ready'),
           expand: () => console.log('Mock WebApp expand'),
           close: () => console.log('Mock WebApp close'),
           sendData: (data: string) => {
             console.log('Mock WebApp sendData called with:', data);
-            // In development, we can also try to send to a test bot
-            if (data === 'test-data' || data === 'verify-account') {
-              console.log('📤 Development: Would send data to bot:', data);
-            }
           },
           MainButton: {
             text: '',
@@ -224,7 +212,6 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
         setTheme('light');
         setThemeParams({});
         setIsReady(true);
-        console.log('✅ Mock Telegram WebApp initialized for development');
       }
     }
   }, []);
