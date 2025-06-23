@@ -127,15 +127,17 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
   const [themeParams, setThemeParams] = useState<TelegramWebApp['themeParams']>({});
 
   useEffect(() => {
-    console.log('TelegramProvider useEffect - checking for Telegram WebApp');
-    console.log('window.Telegram:', !!window.Telegram);
-    console.log('window.Telegram?.WebApp:', !!window.Telegram?.WebApp);
+    console.log('🔍 TelegramProvider useEffect - checking for Telegram WebApp');
+    console.log('window.Telegram:', window.Telegram);
+    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
+    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
     
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      console.log('Telegram WebApp found:', tg);
+      console.log('✅ Telegram WebApp found:', tg);
       console.log('initData:', tg.initData ? 'present' : 'missing');
       console.log('initDataUnsafe:', tg.initDataUnsafe);
+      console.log('sendData function:', tg.sendData);
       
       setWebApp(tg);
       
@@ -149,17 +151,18 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
       setTheme(tg.colorScheme);
       setThemeParams(tg.themeParams);
       setIsReady(true);
-      console.log('Telegram WebApp initialized successfully');
+      console.log('✅ Telegram WebApp initialized successfully');
     } else {
-      console.log('Telegram WebApp not available - running in browser mode');
+      console.log('❌ Telegram WebApp not available - running in browser mode');
       // For development, we can simulate Telegram WebApp
       const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isDevelopment) {
-        console.log('Development mode - simulating Telegram WebApp');
+        console.log('🔧 Development mode - simulating Telegram WebApp');
         const mockWebApp = {
           ready: () => console.log('Mock WebApp ready'),
           expand: () => console.log('Mock WebApp expand'),
           close: () => console.log('Mock WebApp close'),
+          sendData: (data: string) => console.log('Mock WebApp sendData called with:', data),
           MainButton: {
             text: '',
             color: '',
@@ -222,7 +225,7 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
         setTheme('light');
         setThemeParams({});
         setIsReady(true);
-        console.log('Mock Telegram WebApp initialized for development');
+        console.log('✅ Mock Telegram WebApp initialized for development');
       }
     }
   }, []);
