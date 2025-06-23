@@ -348,11 +348,13 @@ export const sendDebugInfoToTelegram = async () => {
       try {
         const urlParams = new URLSearchParams(webApp.initData);
         debugMessage += `🔍 Параметры initData:\n`;
-        for (const [key, value] of urlParams.entries()) {
+        
+        // Используем forEach вместо entries() для совместимости
+        urlParams.forEach((value, key) => {
           if (key !== 'hash') { // Не показываем хеш
             debugMessage += `  ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
           }
-        }
+        });
       } catch (e) {
         debugMessage += `❌ Не удалось декодировать initData: ${e}\n`;
       }
