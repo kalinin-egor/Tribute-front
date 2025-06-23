@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppState } from '../../hooks/useAppState';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaChevronRight } from 'react-icons/fa';
@@ -16,17 +16,19 @@ const ChannelsPage: React.FC = () => {
   const { webApp } = useTelegram();
   const navigate = useNavigate();
   const [isAddingBot, setIsAddingBot] = useState(false);
-  const [checkedChannels, setCheckedChannels] = useState<Set<string>>(new Set());
+  const checkedChannelsRef = useRef<Set<string>>(new Set());
 
   const handleSelectChannel = async () => {
     // Prevent multiple calls while adding bot
     if (isAddingBot) {
+      console.log('🚫 Already adding bot, ignoring click');
       return;
     }
 
     const botUsername = process.env.BOT_USERNAME || 'tribute_egorbot';
     const url = `https://t.me/${botUsername}?startgroup=true&admin=post_messages+edit_messages+delete_messages&start=add_channel`;
     
+    console.log('🎯 Setting isAddingBot to true');
     setIsAddingBot(true);
     console.log('🔗 Opening bot link with URL:', url);
 
@@ -66,11 +68,17 @@ const ChannelsPage: React.FC = () => {
       console.log('📋 Checking channel list...');
       const channels = await tributeApiService.getChannelList();
       console.log('📋 Current channels:', channels);
+      console.log('📋 Number of channels:', channels.length);
       
       // Find channels with is_verified: false that we haven't checked yet
-      const unverifiedChannels = channels.filter((channel: ChannelDTO) => 
-        !channel.is_verified && !checkedChannels.has(channel.id)
-      );
+      const unverifiedChannels = channels.filter((channel: ChannelDTO) => {
+        const isUnverified = !channel.is_verified;
+        const notChecked = !checkedChannelsRef.current.has(channel.id);
+        console.log(`Channel ${channel.channel_title}: is_verified=${channel.is_verified}, checked=${checkedChannelsRef.current.has(channel.id)}`);
+        return isUnverified && notChecked;
+      });
+      
+      console.log('🔍 Unverified channels found:', unverifiedChannels.length);
       
       if (unverifiedChannels.length > 0) {
         console.log('🆕 Found new unverified channels:', unverifiedChannels);
@@ -80,7 +88,7 @@ const ChannelsPage: React.FC = () => {
           console.log(`🔍 Checking ownership for channel: ${channel.channel_title} (${channel.id})`);
           
           // Add to checked set to avoid duplicate checks
-          setCheckedChannels(prev => new Set(Array.from(prev).concat(channel.id)));
+          checkedChannelsRef.current.add(channel.id);
           
           // Check channel ownership
           await checkChannelOwnership(channel.id);
@@ -89,23 +97,41 @@ const ChannelsPage: React.FC = () => {
         // If we found and processed new channels, stop the polling
         setIsAddingBot(false);
         console.log('✅ Channel addition process completed');
+      } else {
+        console.log('📭 No new unverified channels found');
       }
     } catch (error) {
       console.error('❌ Error checking channel list:', error);
+      console.error('❌ Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   };
 
+  // Track isAddingBot changes
+  useEffect(() => {
+    console.log('🔄 isAddingBot changed to:', isAddingBot);
+  }, [isAddingBot]);
+
   // Poll for new channels when adding bot
   useEffect(() => {
-    if (!isAddingBot) return;
+    if (!isAddingBot) {
+      console.log('🛑 Polling stopped - isAddingBot is false');
+      return;
+    }
 
     console.log('🔄 Starting channel polling...');
+    console.log('📊 Current isAddingBot state:', isAddingBot);
     
     // Check immediately
     checkForNewChannels();
 
     // Set up interval to check every second
-    const interval = setInterval(checkForNewChannels, 1000);
+    const interval = setInterval(() => {
+      console.log('⏰ Polling tick - checking for new channels...');
+      checkForNewChannels();
+    }, 1000);
 
     // Set up timeout to stop polling after 30 seconds
     const timeout = setTimeout(() => {
@@ -116,10 +142,11 @@ const ChannelsPage: React.FC = () => {
     }, 30000);
 
     return () => {
+      console.log('🧹 Cleaning up polling interval and timeout');
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [isAddingBot, checkedChannels]);
+  }, [isAddingBot]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {
