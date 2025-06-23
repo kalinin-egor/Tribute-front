@@ -121,44 +121,10 @@ export const getSystemDarkModePreference = (): boolean => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
-// Safe function to send data to Telegram bot
-export const sendDataToTelegram = (data: string, webApp?: any): boolean => {
-  console.log(`📤 Attempting to send data: ${data}`);
-  
-  try {
-    // First try using the webApp object from useTelegram hook
-    if (webApp && typeof webApp.sendData === 'function') {
-      webApp.sendData(data);
-      console.log('✅ Data sent successfully via webApp object');
-      return true;
-    }
-    
-    // Fallback to direct window access
-    if (window.Telegram?.WebApp?.sendData) {
-      window.Telegram.WebApp.sendData(data);
-      console.log('✅ Data sent successfully via window.Telegram.WebApp');
-      return true;
-    }
-    
-    console.error('❌ No valid sendData method found');
-    return false;
-    
-  } catch (error) {
-    console.error('❌ Error sending data to Telegram:', error);
-    
-    // Try fallback method
-    try {
-      if (window.Telegram?.WebApp?.sendData) {
-        window.Telegram.WebApp.sendData(data);
-        console.log('✅ Data sent successfully via fallback method');
-        return true;
-      }
-    } catch (fallbackError) {
-      console.error('❌ Fallback method also failed:', fallbackError);
-    }
-    
-    return false;
-  }
+// ПРОСТАЯ ФУНКЦИЯ КАК В РАБОЧЕМ ПРИМЕРЕ
+export const sendDataToTelegram = (data: string): void => {
+  console.log("Chosen " + data);
+  window.Telegram.WebApp.sendData(data);
 };
 
 // Initialize Telegram WebApp safely

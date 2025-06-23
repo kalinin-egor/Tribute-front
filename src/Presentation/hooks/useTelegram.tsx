@@ -128,32 +128,17 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
 
   useEffect(() => {
     console.log('🔍 TelegramProvider useEffect - checking for Telegram WebApp');
-    console.log('window.Telegram:', window.Telegram);
-    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
-    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
     
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      console.log('✅ Telegram WebApp found:', tg);
-      console.log('initData:', tg.initData ? 'present' : 'missing');
-      console.log('initDataUnsafe:', tg.initDataUnsafe);
-      console.log('sendData function:', tg.sendData);
+      console.log('✅ Telegram WebApp found');
       
-      // Ensure WebApp is ready before using it
-      try {
-        tg.ready();
-        console.log('✅ WebApp.ready() called in provider');
-      } catch (error) {
-        console.error('❌ Error calling WebApp.ready():', error);
-      }
-      
+      // НЕ ВЫЗЫВАЕМ ready() ЗДЕСЬ - это делается в App.tsx
       setWebApp(tg);
       
       if (tg.initDataUnsafe?.user) {
         console.log('User data found:', tg.initDataUnsafe.user);
         setUser(tg.initDataUnsafe.user);
-      } else {
-        console.log('No user data in initDataUnsafe');
       }
       
       setTheme(tg.colorScheme);

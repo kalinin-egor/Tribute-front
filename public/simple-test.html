@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0088cc" />
+    <meta name="description" content="Simple SendData Test" />
+    
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <title>Simple SendData Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-gap: 2vw;
+            width: 100%;
+        }
+        .grid > div {
+            font-size: 3vw;
+            padding: .5em;
+            background: rgb(241, 241, 241);
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .grid > div:hover {
+            background: rgb(220, 220, 220);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Simple SendData Test</h1>
+        <p>ТОЧНО КАК В РАБОЧЕМ ПРИМЕРЕ</p>
+        
+        <div class="grid">
+            <div onclick="chosen('verify-account')">
+                ✅ Verify Account
+            </div>
+            <div onclick="chosen('test-data')">
+                🧪 Test Data
+            </div>
+            <div onclick="chosen('direct-test')">
+                🎯 Direct Test
+            </div>
+            <div onclick="chosen('custom-message')">
+                💬 Custom Message
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+            <h3>Debug Info:</h3>
+            <div id="debug"></div>
+        </div>
+    </div>
+
+    <script>
+        // ТОЧНО КАК В РАБОЧЕМ ПРИМЕРЕ
+        function chosen(name) {
+            console.log("Chosen " + name);
+            window.Telegram.WebApp.sendData(name);
+        }
+        
+        // Простая инициализация
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            
+            // Показать debug info
+            const debugDiv = document.getElementById('debug');
+            debugDiv.innerHTML = `
+                <p>✅ Telegram WebApp detected</p>
+                <p>initData: ${window.Telegram.WebApp.initData ? 'present' : 'missing'}</p>
+                <p>sendData function: ${typeof window.Telegram.WebApp.sendData}</p>
+                <p>Ready: ${window.Telegram.WebApp.initData ? 'Yes' : 'No'}</p>
+            `;
+        } else {
+            document.getElementById('debug').innerHTML = '<p>❌ Telegram WebApp not available</p>';
+        }
+    </script>
+</body>
+</html> 

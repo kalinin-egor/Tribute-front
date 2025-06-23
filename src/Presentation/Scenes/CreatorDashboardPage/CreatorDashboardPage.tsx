@@ -46,38 +46,7 @@ const CreatorDashboardPage: React.FC = () => {
   };
 
   const handleVerifyClick = () => {
-    console.log("Chosen verify-account");
-    const success = sendDataToTelegram('verify-account', webApp);
-    if (success) {
-      console.log('✅ verify-account data sent successfully');
-    } else {
-      console.error('❌ Failed to send verify-account data');
-    }
-  };
-
-  const handleTestSendData = () => {
-    console.log("Chosen test-data");
-    const success = sendDataToTelegram('test-data', webApp);
-    if (success) {
-      console.log('✅ test-data sent successfully');
-    } else {
-      console.error('❌ Failed to send test-data');
-    }
-  };
-
-  const handleDebugWebApp = () => {
-    console.log('🔍 Debugging WebApp state:');
-    console.log('webApp object:', webApp);
-    console.log('isReady:', isReady);
-    console.log('window.Telegram:', window.Telegram);
-    console.log('window.Telegram?.WebApp:', window.Telegram?.WebApp);
-    console.log('window.Telegram?.WebApp?.sendData:', window.Telegram?.WebApp?.sendData);
-    
-    if (webApp) {
-      console.log('webApp.sendData function:', typeof webApp.sendData);
-      console.log('webApp.initData:', webApp.initData ? 'present' : 'missing');
-      console.log('webApp.initDataUnsafe:', webApp.initDataUnsafe);
-    }
+    window.Telegram.WebApp.sendData("verify-account")    
   };
 
   if (!dashboardData) {
@@ -116,39 +85,7 @@ const CreatorDashboardPage: React.FC = () => {
         <>
           <VerifyAccountAlert onClick={handleVerifyClick} />
           <PayoutAlert onClick={handlePayoutClick} />
-          
-          {/* Test button for debugging */}
-          <button 
-            onClick={handleTestSendData}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#ff6b6b',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🧪 Test SendData
-          </button>
-          
-          {/* Debug button */}
-          <button 
-            onClick={handleDebugWebApp}
-            style={{
-              margin: '10px',
-              padding: '10px',
-              backgroundColor: '#4ecdc4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            🔍 Debug WebApp
-          </button>
-          
+  
           {/* Direct sendData test */}
           <button 
             onClick={() => {

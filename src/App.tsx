@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { TelegramProvider } from './Presentation/hooks/useTelegram';
 import { AppStateProvider, useAppState } from './Presentation/hooks/useAppState';
-import { initializeTelegramWebApp } from './utils/helpers';
 import HomePage from './Presentation/Scenes/HomePage/HomePage';
 import MonetizationPage from './Presentation/Scenes/MonetizationPage/MonetizationPage';
 import ProfilePage from './Presentation/Scenes/ProfilePage/ProfilePage';
@@ -23,12 +22,12 @@ function AppContent() {
   const { isLoading, error, isOnboarded } = useAppState();
 
   useEffect(() => {
-    // Initialize Telegram Web App using utility function
-    const success = initializeTelegramWebApp();
-    if (success) {
-      console.log('✅ Telegram WebApp initialized successfully');
-    } else {
-      console.log('⚠️ Telegram WebApp initialization failed or not available');
+    // ПРОСТАЯ ИНИЦИАЛИЗАЦИЯ КАК В РАБОЧЕМ ПРИМЕРЕ
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      window.Telegram.WebApp.setHeaderColor('#ffffff');
+      window.Telegram.WebApp.setBackgroundColor('#f2f2f2');
     }
   }, []);
 
