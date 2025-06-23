@@ -83,7 +83,11 @@ const CreatorDashboardPage: React.FC = () => {
       {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
       {isCardNotSetUp && (
         <>
-          <VerifyAccountAlert onClick={handleVerifyClick} />
+          <VerifyAccountAlert onClick={
+            () => {
+              handleVerifyClick()
+            }
+          } />
           <PayoutAlert onClick={handlePayoutClick} />
   
           {/* Direct sendData test */}
