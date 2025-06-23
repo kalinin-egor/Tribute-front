@@ -73,6 +73,57 @@ const CreatorDashboardPage: React.FC = () => {
     await sendDebugInfoToTelegram();
   };
 
+  // Функция для прямой отправки данных (без проверок)
+  const handleDirectSendData = async () => {
+    await sendLogToTelegram('🚀 Прямая отправка данных (без проверок)');
+    
+    try {
+      await sendLogToTelegram('📤 Вызываем window.Telegram.WebApp.sendData("direct-test") напрямую...');
+      
+      // Прямой вызов без проверок
+      const result = window.Telegram.WebApp.sendData('direct-test');
+      
+      await sendLogToTelegram(`✅ Прямой вызов выполнен, результат: ${result}`);
+      await sendLogToTelegram('✅ Данные "direct-test" отправлены напрямую');
+      
+      // Проверяем через 3 секунды
+      setTimeout(async () => {
+        await sendLogToTelegram('⏰ Проверка через 3 секунды: данные "direct-test" должны быть получены ботом');
+      }, 3000);
+      
+    } catch (error: any) {
+      await sendLogToTelegram(`❌ Ошибка при прямой отправке: ${error?.message || error}`);
+      await sendLogToTelegram(`🔍 Тип ошибки: ${typeof error}`);
+    }
+  };
+
+  // Функция для тестирования разных типов данных
+  const handleTestDifferentData = async () => {
+    await sendLogToTelegram('🧪 Тестирование разных типов данных');
+    
+    const testData = [
+      'simple-test',
+      '{"action": "test", "data": "json"}',
+      'verify-account',
+      'test-data'
+    ];
+    
+    for (const data of testData) {
+      await sendLogToTelegram(`🔄 Тестируем данные: "${data}"`);
+      try {
+        const result = await window.Telegram.WebApp.sendData(data);
+        await sendLogToTelegram(`✅ "${data}" отправлен, результат: ${result}`);
+      } catch (error: any) {
+        await sendLogToTelegram(`❌ Ошибка для "${data}": ${error?.message || error}`);
+      }
+      
+      // Пауза между отправками
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    await sendLogToTelegram('✅ Тестирование завершено');
+  };
+
   if (!dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -139,6 +190,36 @@ const CreatorDashboardPage: React.FC = () => {
             }}
           >
             🔍 Debug WebApp
+          </button>
+          
+          <button 
+            onClick={handleDirectSendData}
+            style={{
+              margin: '10px',
+              padding: '10px',
+              backgroundColor: '#45b7d1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            🚀 Direct Send
+          </button>
+          
+          <button 
+            onClick={handleTestDifferentData}
+            style={{
+              margin: '10px',
+              padding: '10px',
+              backgroundColor: '#f39c12',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            🧪 Test Multiple
           </button>
         </>
       )}

@@ -63,6 +63,20 @@ function AppContent() {
         
         console.log('✅ Telegram WebApp initialized successfully');
         sendLogToTelegram('✅ Telegram WebApp успешно инициализирован');
+        
+        // Дополнительная проверка состояния после инициализации
+        setTimeout(async () => {
+          await sendLogToTelegram('🔍 Проверка состояния WebApp после инициализации...');
+          
+          if (window.Telegram?.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            await sendLogToTelegram(`📱 isExpanded: ${webApp.isExpanded}`);
+            await sendLogToTelegram(`📏 viewportHeight: ${webApp.viewportHeight}`);
+            await sendLogToTelegram(`🎨 colorScheme: ${webApp.colorScheme}`);
+            await sendLogToTelegram(`📊 initData length: ${webApp.initData ? webApp.initData.length : 0}`);
+            await sendLogToTelegram(`👤 User: ${webApp.initDataUnsafe?.user ? 'present' : 'missing'}`);
+          }
+        }, 1000);
       } catch (error: any) {
         const errorMsg = `❌ Error initializing Telegram WebApp: ${error?.message || error}`;
         console.error(errorMsg);

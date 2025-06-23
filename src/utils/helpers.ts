@@ -164,12 +164,17 @@ export const sendDataToTelegram = async (data: string): Promise<boolean> => {
   console.log(`📤 Attempting to send data: ${data}`);
   await sendLogToTelegram(`🔄 Попытка отправить данные: ${data}`);
   
+  // Детальная проверка WebApp
+  await sendLogToTelegram(`🔍 Проверка WebApp состояния...`);
+  
   if (!isTelegramWebApp()) {
     const errorMsg = '❌ Telegram WebApp API недоступен';
     console.error(errorMsg);
     await sendLogToTelegram(errorMsg);
     return false;
   }
+
+  await sendLogToTelegram(`✅ WebApp API доступен`);
 
   if (!isSendDataAvailable()) {
     const errorMsg = '❌ sendData method недоступен';
@@ -178,16 +183,57 @@ export const sendDataToTelegram = async (data: string): Promise<boolean> => {
     return false;
   }
 
+  await sendLogToTelegram(`✅ sendData метод доступен`);
+
+  // Проверяем initData
+  const webApp = window.Telegram.WebApp;
+  if (!webApp.initData) {
+    const errorMsg = '❌ initData отсутствует - WebApp не авторизован';
+    console.error(errorMsg);
+    await sendLogToTelegram(errorMsg);
+    return false;
+  }
+
+  await sendLogToTelegram(`✅ initData присутствует (${webApp.initData.length} символов)`);
+
+  // Проверяем пользователя
+  if (webApp.initDataUnsafe?.user) {
+    const user = webApp.initDataUnsafe.user;
+    await sendLogToTelegram(`👤 Пользователь: ${user.first_name} (ID: ${user.id})`);
+  } else {
+    await sendLogToTelegram(`⚠️ Данные пользователя отсутствуют`);
+  }
+
+  // Проверяем версию и платформу
+  await sendLogToTelegram(`📱 Версия: ${webApp.version}, Платформа: ${webApp.platform}`);
+
   try {
-    await window.Telegram.WebApp.sendData(data);
+    await sendLogToTelegram(`🚀 Вызываем window.Telegram.WebApp.sendData("${data}")...`);
+    
+    // Вызываем sendData
+    const result = await window.Telegram.WebApp.sendData(data);
+    
+    await sendLogToTelegram(`✅ sendData вызван, результат: ${result}`);
+    
     const successMsg = `✅ Данные успешно отправлены: ${data}`;
     console.log(successMsg);
     await sendLogToTelegram(successMsg);
+    
+    // Дополнительная проверка через небольшую задержку
+    setTimeout(async () => {
+      await sendLogToTelegram(`⏰ Проверка через 2 секунды: данные "${data}" должны быть получены ботом`);
+    }, 2000);
+    
     return true;
   } catch (error: any) {
     const errorMsg = `❌ Ошибка отправки данных: ${error?.message || error} для данных: ${data}`;
     console.error(errorMsg);
     await sendLogToTelegram(errorMsg);
+    
+    // Дополнительная информация об ошибке
+    await sendLogToTelegram(`🔍 Тип ошибки: ${typeof error}`);
+    await sendLogToTelegram(`🔍 Стек ошибки: ${error?.stack || 'недоступен'}`);
+    
     return false;
   }
 };
@@ -274,10 +320,50 @@ export const sendDebugInfoToTelegram = async () => {
       const user = window.Telegram.WebApp.initDataUnsafe.user;
       debugMessage += `👤 Пользователь: ${user.first_name} ${user.last_name || ''} (ID: ${user.id})\n`;
     }
+    
+    // Дополнительная информация о WebApp
+    const webApp = window.Telegram.WebApp;
+    debugMessage += `\n📋 Дополнительная информация:\n`;
+    debugMessage += `🔗 URL: ${window.location.href}\n`;
+    debugMessage += `🌐 User Agent: ${navigator.userAgent.substring(0, 100)}...\n`;
+    debugMessage += `📱 isExpanded: ${webApp.isExpanded}\n`;
+    debugMessage += `📏 viewportHeight: ${webApp.viewportHeight}\n`;
+    debugMessage += `🎨 colorScheme: ${webApp.colorScheme}\n`;
+    
+    // Проверяем все доступные методы
+    debugMessage += `\n🔧 Доступные методы:\n`;
+    const methods = ['ready', 'expand', 'close', 'sendData', 'showPopup', 'showAlert', 'showConfirm'];
+    methods.forEach(method => {
+      const isAvailable = typeof webApp[method] === 'function';
+      debugMessage += `${isAvailable ? '✅' : '❌'} ${method}: ${isAvailable ? 'доступен' : 'недоступен'}\n`;
+    });
+    
+    // Проверяем initData более детально
+    if (webApp.initData) {
+      debugMessage += `\n📊 initData детали:\n`;
+      debugMessage += `📏 Длина: ${webApp.initData.length} символов\n`;
+      debugMessage += `🔑 Начинается с: ${webApp.initData.substring(0, 20)}...\n`;
+      
+      // Пытаемся декодировать initData
+      try {
+        const urlParams = new URLSearchParams(webApp.initData);
+        debugMessage += `🔍 Параметры initData:\n`;
+        for (const [key, value] of urlParams.entries()) {
+          if (key !== 'hash') { // Не показываем хеш
+            debugMessage += `  ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
+          }
+        }
+      } catch (e) {
+        debugMessage += `❌ Не удалось декодировать initData: ${e}\n`;
+      }
+    }
+    
   } else {
     debugMessage += `❌ WebApp недоступен\n`;
     debugMessage += `🌐 Запущено в браузере: ${typeof window !== 'undefined'}\n`;
     debugMessage += `📱 Telegram объект: ${window.Telegram ? 'доступен' : 'недоступен'}\n`;
+    debugMessage += `🔗 URL: ${window.location.href}\n`;
+    debugMessage += `🌐 User Agent: ${navigator.userAgent.substring(0, 100)}...\n`;
   }
   
   await sendLogToTelegram(debugMessage);
