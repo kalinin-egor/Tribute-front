@@ -43,6 +43,18 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
     memberSince: 'Today',
   };
 
+  const handleNotificationsClick = () => {
+    // TODO: Implement notifications settings
+  };
+
+  const handlePrivacyClick = () => {
+    // TODO: Implement privacy settings
+  };
+
+  const handleHelpSupportClick = () => {
+    // TODO: Implement help and support
+  };
+
   const settings: SettingItem[] = [
     {
       id: 'notifications',
@@ -75,18 +87,6 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
       onClick: handleHelpSupportClick,
     },
   ];
-
-  const handleNotificationsClick = () => {
-    // TODO: Implement notifications settings
-  };
-
-  const handlePrivacyClick = () => {
-    // TODO: Implement privacy settings
-  };
-
-  const handleHelpSupportClick = () => {
-    // TODO: Implement help and support
-  };
 
   return (
     <div className={`${styles.container} ${styles.animateFadeIn}`}>

@@ -40,6 +40,10 @@ const HomePage: React.FC<HomePageProps> = () => {
     givenTributes: 0,
   };
 
+  const handleNewTributeClick = () => {
+    // TODO: Implement new tribute functionality
+  };
+
   const quickActions: QuickAction[] = [
     {
       id: 'profile',
@@ -66,10 +70,6 @@ const HomePage: React.FC<HomePageProps> = () => {
       iconColor: 'green',
     },
   ];
-
-  const handleNewTributeClick = () => {
-    // TODO: Implement new tribute functionality
-  };
 
   return (
     <div className={`${styles.container} ${styles.animateFadeIn}`}>

@@ -166,7 +166,7 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
         };
         
         setWebApp(mockWebApp as any);
-        setUser(mockWebApp.initDataUnsafe.user);
+        setUser(null);
         setTheme('light');
         setThemeParams({});
         setIsReady(true);

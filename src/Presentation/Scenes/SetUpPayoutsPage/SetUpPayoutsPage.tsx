@@ -35,19 +35,12 @@ const SetUpPayoutsPage: React.FC = () => {
 
     try {
       const response = await tributeApiService.setUpPayouts({
-        card_number: cardNumber.replace(/\s/g, ''),
-        expiry_date: expiryDate,
-        cvv: cvv,
-        cardholder_name: cardholderName,
+        'card-number': cardNumber.replace(/\s/g, '')
       });
 
-      if (response.success) {
-        await refreshDashboard();
-        alert('Способ выплат успешно настроен!');
-        navigate('/dashboard');
-      } else {
-        setError(response.message || 'Failed to set up payouts');
-      }
+      await refreshDashboard();
+      alert('Способ выплат успешно настроен!');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Error setting up payouts:', error);
       // Если ошибка 403, показать текст ошибки от сервера под полем ввода
