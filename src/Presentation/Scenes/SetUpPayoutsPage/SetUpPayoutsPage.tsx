@@ -44,9 +44,25 @@ const SetUpPayoutsPage: React.FC = () => {
       
       // Navigate back to dashboard
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error setting up payouts:', error);
-      setError('Ошибка при настройке выплат. Попробуйте еще раз.');
+      // Если ошибка 403, показать текст ошибки от сервера под полем ввода
+      if (error && error.message && error.message.includes('403')) {
+        // Попробуем извлечь текст ошибки из error.message
+        let serverError = 'Ошибка при настройке выплат. Попробуйте еще раз.';
+        try {
+          const match = error.message.match(/\{.*\}/);
+          if (match) {
+            const parsed = JSON.parse(match[0]);
+            if (parsed.error) serverError = parsed.error;
+          }
+        } catch {}
+        setError(serverError);
+      } else if (error && error.message) {
+        setError(error.message);
+      } else {
+        setError('Ошибка при настройке выплат. Попробуйте еще раз.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -118,7 +134,7 @@ const SetUpPayoutsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.footer}>
+      <div className={styles.footerFixed}>
         <button
           onClick={handleSubmit}
           disabled={isSubmitting || !cardNumber.trim()}

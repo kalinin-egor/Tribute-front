@@ -1,21 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
+import { useTelegram } from '../../hooks/useTelegram';
 import styles from './CreatorDashboardPage.module.css';
 import QuickActions from '../../Components/QuickActions/QuickActions';
 import EarningsSummary from '../../Components/EarningsSummary/EarningsSummary';
 import DashboardNav from '../../Components/DashboardNav/DashboardNav';
 import PayoutAlert from '../../Components/PayoutAlert/PayoutAlert';
+import VerifyAccountAlert from '../../Components/VerifyAccountAlert/VerifyAccountAlert';
 import GettingStarted from '../../Components/GettingStarted/GettingStarted';
 import MainMenu from '../../Components/MainMenu/MainMenu';
 import TransactionsPlaceholder from '../../Components/TransactionsPlaceholder/TransactionsPlaceholder';
 
 const CreatorDashboardPage: React.FC = () => {
   const { dashboardData, refreshDashboard } = useAppState();
+  const { webApp } = useTelegram();
   const navigate = useNavigate();
 
   const handlePayoutClick = () => {
     navigate('/set-up-payouts');
+  };
+
+  const handleVerifyClick = () => {
+    if (webApp) {
+      webApp.sendData('verify-account');
+      webApp.close();
+    }
   };
 
   if (!dashboardData) {
@@ -49,9 +59,12 @@ const CreatorDashboardPage: React.FC = () => {
       
       <DashboardNav />
       
-      {/* Show PayoutAlert only if card is not set up */}
+      {/* Show VerifyAccountAlert and PayoutAlert only if card is not set up */}
       {isCardNotSetUp && (
-        <PayoutAlert onClick={handlePayoutClick} />
+        <>
+          <VerifyAccountAlert onClick={handleVerifyClick} />
+          <PayoutAlert onClick={handlePayoutClick} />
+        </>
       )}
       
       {dashboardData['channels-and-groups'].length === 0 && (
