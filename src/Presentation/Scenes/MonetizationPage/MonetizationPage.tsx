@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTelegram } from '../../hooks/useTelegram';
 import { useAppState } from '../../hooks/useAppState';
 import FeatureItem from '../../Components/FeatureItem';
@@ -66,7 +66,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
     },
   ];
 
-  const handleOnboarding = async () => {
+  const handleOnboarding = useCallback(async () => {
     if (!termsAccepted || isOnboarding) return;
 
     setIsOnboarding(true);
@@ -88,28 +88,25 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
         webApp.MainButton.hideProgress();
       }
     }
-  };
+  }, [termsAccepted, isOnboarding, webApp, onboardUser]);
 
-  const handlers: MonetizationPageHandlers = {
-    handleMonetizeClick: handleOnboarding,
-    handleTermsChange: (accepted: boolean) => {
-      setTermsAccepted(accepted);
-    },
-  };
+  const handleTermsChange = useCallback((accepted: boolean) => {
+    setTermsAccepted(accepted);
+  }, []);
 
   useEffect(() => {
     if (!webApp) return;
 
     webApp.MainButton.setText(isOnboarding ? 'Регистрация...' : 'Монетизироваться');
     webApp.MainButton.color = '#30a4fc';
-    webApp.MainButton.onClick(handlers.handleMonetizeClick);
+    webApp.MainButton.onClick(handleOnboarding);
     webApp.MainButton.show();
 
     return () => {
-      webApp.MainButton.offClick(handlers.handleMonetizeClick);
+      webApp.MainButton.offClick(handleOnboarding);
       webApp.MainButton.hide();
     };
-  }, [webApp, isOnboarding, handlers.handleMonetizeClick]);
+  }, [webApp, isOnboarding, handleOnboarding]);
 
   useEffect(() => {
     if (!webApp) return;
@@ -154,7 +151,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
             type="checkbox"
             id="terms"
             checked={termsAccepted}
-            onChange={(e) => handlers.handleTermsChange(e.target.checked)}
+            onChange={(e) => handleTermsChange(e.target.checked)}
             className={styles.termsCheckbox}
             disabled={isOnboarding}
           />
@@ -169,7 +166,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
         <div className={styles.fallbackButton}>
            <div className={styles.fallbackButtonContent}>
               <button
-                onClick={handlers.handleMonetizeClick}
+                onClick={handleOnboarding}
                 disabled={!termsAccepted || isOnboarding}
                 className={`${styles.fallbackButtonElement} ${
                   termsAccepted && !isOnboarding
