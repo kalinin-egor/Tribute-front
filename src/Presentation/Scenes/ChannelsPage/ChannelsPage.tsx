@@ -18,6 +18,7 @@ const ChannelsPage: React.FC = () => {
   const navigate = useNavigate();
   const [isAddingBot, setIsAddingBot] = useState(false);
   const checkedChannelsRef = useRef<Set<string>>(new Set());
+  const hasNewChannelsRef = useRef(false);
 
   const handleSelectChannel = useCallback(async () => {
     // Prevent multiple calls while adding bot
@@ -81,6 +82,8 @@ const ChannelsPage: React.FC = () => {
             const response = await checkChannelOwnership(channel.id);
             if (response) {
               checkedChannelsRef.current.add(channel.id);
+              hasNewChannelsRef.current = true;
+              console.log('✅ Channel verified successfully:', channel.channel_username);
             }
           }
         }
@@ -97,8 +100,22 @@ const ChannelsPage: React.FC = () => {
 
     if (isAddingBot) {
       // Опрашиваем каждые 2 секунды
-      intervalId = setInterval(() => {
-        processNewChannels();
+      intervalId = setInterval(async () => {
+        await processNewChannels();
+        
+        // Если нашли новые каналы, обновляем dashboard
+        if (hasNewChannelsRef.current) {
+          console.log('🔄 New channels found, refreshing dashboard...');
+          try {
+            await refreshDashboard();
+            console.log('✅ Dashboard refreshed successfully');
+          } catch (error) {
+            console.error('❌ Error refreshing dashboard:', error);
+          } finally {
+            hasNewChannelsRef.current = false;
+            setIsAddingBot(false); // Останавливаем опрос после успешного обновления
+          }
+        }
       }, 2000);
 
       // Останавливаем опрос через 30 секунд
@@ -111,7 +128,7 @@ const ChannelsPage: React.FC = () => {
       if (intervalId) clearInterval(intervalId);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isAddingBot, processNewChannels]);
+  }, [isAddingBot, processNewChannels, refreshDashboard]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {
@@ -185,8 +202,12 @@ const ChannelsPage: React.FC = () => {
       </ul>
       
       <div className={styles.footer}>
-         <button onClick={handleSelectChannel} className={styles.actionButton}>
-            Add another channel
+         <button 
+           onClick={handleSelectChannel} 
+           className={styles.actionButton}
+           disabled={isAddingBot}
+         >
+            {isAddingBot ? 'Добавление...' : 'Add another channel'}
         </button>
       </div>
     </div>
