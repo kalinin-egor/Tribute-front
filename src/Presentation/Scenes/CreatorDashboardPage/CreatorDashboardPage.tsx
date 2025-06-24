@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../../hooks/useAppState';
 import { useTelegram } from '../../hooks/useTelegram';
@@ -23,12 +23,12 @@ const CreatorDashboardPage: React.FC = () => {
   const { webApp, isReady } = useTelegram();
   const navigate = useNavigate();
 
-  const handlePayoutClick = () => {
+  const handlePayoutClick = useCallback(() => {
     navigate('/set-up-payouts');
-  };
+  }, [navigate]);
 
   // Функция для отправки verify-account
-  const handleVerifyAccount = async () => {
+  const handleVerifyAccount = useCallback(async () => {
     try {
       const success = await sendDataToTelegram('verify-account');
       if (success) {
@@ -39,10 +39,10 @@ const CreatorDashboardPage: React.FC = () => {
     } catch (error) {
       console.error('Error sending verify-account:', error);
     }
-  };
+  }, []);
 
   // Функция для отправки test-data
-  const handleTestData = async () => {
+  const handleTestData = useCallback(async () => {
     try {
       const success = await sendDataToTelegram('test-data');
       if (success) {
@@ -53,15 +53,15 @@ const CreatorDashboardPage: React.FC = () => {
     } catch (error) {
       console.error('Error sending test-data:', error);
     }
-  };
+  }, []);
 
   // Функция для отладки WebApp
-  const handleDebugInfo = async () => {
+  const handleDebugInfo = useCallback(async () => {
     await sendDebugInfoToTelegram();
-  };
+  }, []);
 
   // Функция для прямой отправки данных (без проверок)
-  const handleDirectSendData = async () => {
+  const handleDirectSendData = useCallback(async () => {
     try {
       console.log('🚀 Прямая отправка данных (без проверок)');
       
@@ -85,10 +85,10 @@ const CreatorDashboardPage: React.FC = () => {
       console.error(`❌ Ошибка при прямой отправке: ${error?.message || error}`);
       console.error(`🔍 Тип ошибки: ${typeof error}`);
     }
-  };
+  }, []);
 
   // Функция для тестирования разных типов данных
-  const handleTestDifferentData = async () => {
+  const handleTestDifferentData = useCallback(async () => {
     console.log('🧪 Тестирование разных типов данных');
     
     const testData = [
@@ -114,7 +114,7 @@ const CreatorDashboardPage: React.FC = () => {
     }
     
     console.log('✅ Тестирование завершено');
-  };
+  }, []);
 
   if (!dashboardData) {
     return (

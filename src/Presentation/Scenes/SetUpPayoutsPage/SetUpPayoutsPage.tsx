@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from '../../hooks/useTelegram';
 import { useAppState } from '../../hooks/useAppState';
-import tributeApiService from '../../../Data/api';
+import { useApi } from '../../hooks/useApi';
 import styles from './SetUpPayoutsPage.module.css';
 
 const SetUpPayoutsPage: React.FC = () => {
   const { webApp } = useTelegram();
   const { refreshDashboard } = useAppState();
+  const { setUpPayouts } = useApi();
   const navigate = useNavigate();
   const [cardNumber, setCardNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -34,7 +35,7 @@ const SetUpPayoutsPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await tributeApiService.setUpPayouts({
+      const response = await setUpPayouts({
         'card-number': cardNumber.replace(/\s/g, '')
       });
 
@@ -63,20 +64,20 @@ const SetUpPayoutsPage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [cardNumber, setUpPayouts, refreshDashboard, navigate]);
 
   // Format card number with spaces
-  const formatCardNumber = (value: string) => {
+  const formatCardNumber = useCallback((value: string) => {
     const cleaned = value.replace(/\s/g, '');
     const groups = cleaned.match(/.{1,4}/g);
     return groups ? groups.join(' ') : cleaned;
-  };
+  }, []);
 
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCardNumberChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCardNumber(e.target.value);
     setCardNumber(formatted);
     setError(''); // Clear error when user starts typing
-  };
+  }, [formatCardNumber]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {

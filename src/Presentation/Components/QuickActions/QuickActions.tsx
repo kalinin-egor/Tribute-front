@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ChannelDTO } from '../../../Domain/types';
 import styles from './QuickActions.module.css';
 import StoryViewer from '../../Scenes/CreatorDashboardPage/components/StoryViewer/StoryViewer';
@@ -38,13 +38,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, o
   const [actions, setActions] = useState(initialActions);
   const [activeStory, setActiveStory] = useState<any | null>(null);
 
-  const handleActionClick = (action: any) => {
+  const handleActionClick = useCallback((action: any) => {
     if (action.slides.length > 0) {
       setActiveStory(action);
     }
-  };
+  }, []);
 
-  const handleCloseViewer = () => {
+  const handleCloseViewer = useCallback(() => {
     if (activeStory) {
       const newActions = actions.map(a =>
         a.id === activeStory.id ? { ...a, watched: true } : a
@@ -52,7 +52,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ channels, isSubPublished, o
       setActions(newActions);
     }
     setActiveStory(null);
-  };
+  }, [activeStory, actions]);
 
   return (
     <>

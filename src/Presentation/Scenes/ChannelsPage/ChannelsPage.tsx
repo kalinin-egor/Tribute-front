@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useAppState } from '../../hooks/useAppState';
+import { useApi } from '../../hooks/useApi';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaChevronRight } from 'react-icons/fa';
 import { useTelegram } from '../../hooks/useTelegram';
-import tributeApiService from '../../../Data/api';
 import { ChannelDTO } from '../../../Domain/types';
 import styles from './ChannelsPage.module.css';
 import duckImage from '../../../assets/images/misunderstood-duck.png';
@@ -13,12 +13,13 @@ const ChevronIcon = FaChevronRight as React.ComponentType<{ className?: string }
 
 const ChannelsPage: React.FC = () => {
   const { dashboardData, refreshDashboard } = useAppState();
+  const { getChannelList, checkChannel } = useApi();
   const { webApp } = useTelegram();
   const navigate = useNavigate();
   const [isAddingBot, setIsAddingBot] = useState(false);
   const checkedChannelsRef = useRef<Set<string>>(new Set());
 
-  const handleSelectChannel = async () => {
+  const handleSelectChannel = useCallback(async () => {
     // Prevent multiple calls while adding bot
     if (isAddingBot) {
       console.log('🚫 Already adding bot, ignoring click');
@@ -43,9 +44,9 @@ const ChannelsPage: React.FC = () => {
       alert('Ошибка при открытии ссылки на бота');
       setIsAddingBot(false);
     }
-  };
+  }, [isAddingBot, webApp]);
 
-  const handleAddBotClick = async () => {
+  const handleAddBotClick = useCallback(async () => {
     if (isAddingBot) {
       return;
     }
@@ -54,21 +55,21 @@ const ChannelsPage: React.FC = () => {
     
     const url = `https://t.me/TributeBot?start=add_bot`;
     window.open(url, '_blank');
-  };
+  }, [isAddingBot]);
 
-  const checkChannelOwnership = async (channelId: string) => {
+  const checkChannelOwnership = useCallback(async (channelId: string) => {
     try {
-      const response = await tributeApiService.checkChannel(channelId);
+      const response = await checkChannel(channelId);
       return response;
     } catch (error) {
       console.error('Error checking channel ownership:', error);
       return null;
     }
-  };
+  }, [checkChannel]);
 
-  const processNewChannels = async () => {
+  const processNewChannels = useCallback(async () => {
     try {
-      const channels = await tributeApiService.getChannelList();
+      const channels = await getChannelList();
       
       // Находим непроверенные каналы
       const unverifiedChannels = channels.filter(channel => !channel.is_verified);
@@ -87,7 +88,7 @@ const ChannelsPage: React.FC = () => {
     } catch (error) {
       console.error('Error processing new channels:', error);
     }
-  };
+  }, [getChannelList, checkChannelOwnership]);
 
   // Эффект для опроса каналов
   useEffect(() => {
@@ -110,7 +111,7 @@ const ChannelsPage: React.FC = () => {
       if (intervalId) clearInterval(intervalId);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isAddingBot]);
+  }, [isAddingBot, processNewChannels]);
 
   // Show back button on mount and hide on unmount
   useEffect(() => {

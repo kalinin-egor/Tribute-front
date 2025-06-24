@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from '../../hooks/useTelegram';
 import styles from './ProfilePage.module.css';
@@ -43,19 +43,19 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
     memberSince: 'Today',
   };
 
-  const handleNotificationsClick = () => {
+  const handleNotificationsClick = useCallback(() => {
     // TODO: Implement notifications settings
-  };
+  }, []);
 
-  const handlePrivacyClick = () => {
+  const handlePrivacyClick = useCallback(() => {
     // TODO: Implement privacy settings
-  };
+  }, []);
 
-  const handleHelpSupportClick = () => {
+  const handleHelpSupportClick = useCallback(() => {
     // TODO: Implement help and support
-  };
+  }, []);
 
-  const settings: SettingItem[] = [
+  const settings: SettingItem[] = useMemo(() => [
     {
       id: 'notifications',
       title: 'Notifications',
@@ -86,7 +86,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
       ),
       onClick: handleHelpSupportClick,
     },
-  ];
+  ], [handleNotificationsClick, handlePrivacyClick, handleHelpSupportClick]);
 
   return (
     <div className={`${styles.container} ${styles.animateFadeIn}`}>

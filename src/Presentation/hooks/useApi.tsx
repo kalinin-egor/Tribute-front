@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import tributeApiService from '../../Data/api';
 import { 
   OnboardUserUseCase,
@@ -18,30 +18,32 @@ import {
 } from '../../Domain/types';
 
 export const useApi = () => {
-  // Инициализируем use cases
-  const onboardUserUseCase = new OnboardUserUseCase(tributeApiService);
-  const getDashboardUseCase = new GetDashboardUseCase(tributeApiService);
-  const addBotUseCase = new AddBotUseCase(tributeApiService, ChannelValidationService);
-  const publishSubscriptionUseCase = new PublishSubscriptionUseCase(tributeApiService);
+  // Инициализируем use cases с useMemo для стабилизации
+  const useCases = useMemo(() => ({
+    onboardUserUseCase: new OnboardUserUseCase(tributeApiService),
+    getDashboardUseCase: new GetDashboardUseCase(tributeApiService),
+    addBotUseCase: new AddBotUseCase(tributeApiService, ChannelValidationService),
+    publishSubscriptionUseCase: new PublishSubscriptionUseCase(tributeApiService),
+  }), []);
 
   const createUser = useCallback(async () => {
-    return await onboardUserUseCase.execute();
-  }, [onboardUserUseCase]);
+    return await useCases.onboardUserUseCase.execute();
+  }, [useCases.onboardUserUseCase]);
 
   const getDashboard = useCallback(async (): Promise<DashboardResponse> => {
-    return await getDashboardUseCase.execute();
-  }, [getDashboardUseCase]);
+    return await useCases.getDashboardUseCase.execute();
+  }, [useCases.getDashboardUseCase]);
 
   const addBot = useCallback(async (channelUsername: string) => {
-    return await addBotUseCase.execute(channelUsername);
-  }, [addBotUseCase]);
+    return await useCases.addBotUseCase.execute(channelUsername);
+  }, [useCases.addBotUseCase]);
 
   const publishSubscription = useCallback(async (
     request: PublishSubscriptionRequest, 
     user: UserResponse
   ) => {
-    return await publishSubscriptionUseCase.execute(request, user);
-  }, [publishSubscriptionUseCase]);
+    return await useCases.publishSubscriptionUseCase.execute(request, user);
+  }, [useCases.publishSubscriptionUseCase]);
 
   // Методы, которые пока не имеют use cases (можно добавить позже)
   const createSubscribe = useCallback(async (request: CreateSubscribeRequest) => {
@@ -64,6 +66,15 @@ export const useApi = () => {
     return await tributeApiService.healthCheck();
   }, []);
 
+  // Методы для работы с каналами
+  const getChannelList = useCallback(async () => {
+    return await tributeApiService.getChannelList();
+  }, []);
+
+  const checkChannel = useCallback(async (channelId: string) => {
+    return await tributeApiService.checkChannel(channelId);
+  }, []);
+
   return {
     createUser,
     getDashboard,
@@ -74,5 +85,7 @@ export const useApi = () => {
     uploadVerifiedPassport,
     checkVerifiedPassport,
     healthCheck,
+    getChannelList,
+    checkChannel,
   };
 }; 

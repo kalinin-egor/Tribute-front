@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from '../../hooks/useTelegram';
 import styles from './HomePage.module.css';
@@ -40,11 +40,15 @@ const HomePage: React.FC<HomePageProps> = () => {
     givenTributes: 0,
   };
 
-  const handleNewTributeClick = () => {
+  const handleNewTributeClick = useCallback(() => {
     // TODO: Implement new tribute functionality
-  };
+  }, []);
 
-  const quickActions: QuickAction[] = [
+  const handleProfileClick = useCallback(() => {
+    navigate('/dashboard');
+  }, [navigate]);
+
+  const quickActions: QuickAction[] = useMemo(() => [
     {
       id: 'profile',
       title: 'Profile',
@@ -54,7 +58,7 @@ const HomePage: React.FC<HomePageProps> = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       ),
-      onClick: () => navigate('/dashboard'),
+      onClick: handleProfileClick,
       iconColor: 'primary',
     },
     {
@@ -69,7 +73,7 @@ const HomePage: React.FC<HomePageProps> = () => {
       onClick: handleNewTributeClick,
       iconColor: 'green',
     },
-  ];
+  ], [handleProfileClick, handleNewTributeClick]);
 
   return (
     <div className={`${styles.container} ${styles.animateFadeIn}`}>

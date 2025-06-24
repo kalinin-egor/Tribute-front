@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTelegram } from '../../hooks/useTelegram';
 import { useAppState } from '../../hooks/useAppState';
 import FeatureItem from '../../Components/FeatureItem';
@@ -14,8 +14,12 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   const { onboardUser } = useAppState();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
+  
+  // Стабилизируем ссылку на onboardUser
+  const onboardUserRef = useRef(onboardUser);
+  onboardUserRef.current = onboardUser;
 
-  const features: Feature[] = [
+  const features: Feature[] = useMemo(() => [
     {
       icon: FaHeart as React.ComponentType<{ className?: string }>,
       iconBgColor: 'bg-red-500',
@@ -64,7 +68,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
       title: 'Подробная статистика',
       description: 'Следите за вашей статистикой: доходами и активностью подписчиков.',
     },
-  ];
+  ], []);
 
   const handleOnboarding = useCallback(async () => {
     if (!termsAccepted || isOnboarding) return;
@@ -75,7 +79,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
     }
 
     try {
-      await onboardUser();
+      await onboardUserRef.current();
     } catch (error) {
       console.error('Onboarding failed:', error);
       if (isTelegramWebApp() && webApp) {
@@ -88,7 +92,7 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
         webApp.MainButton.hideProgress();
       }
     }
-  }, [termsAccepted, isOnboarding, webApp, onboardUser]);
+  }, [termsAccepted, isOnboarding, webApp]);
 
   const handleTermsChange = useCallback((accepted: boolean) => {
     setTermsAccepted(accepted);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './DashboardNav.module.css';
 
@@ -11,7 +11,15 @@ const navItems = [
 const DashboardNav: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleNavClick = (action: string) => {
+  const handleStatisticsClick = useCallback(() => {
+    // TODO: Implement statistics navigation
+  }, []);
+
+  const handleMoreClick = useCallback(() => {
+    // TODO: Implement more options
+  }, []);
+
+  const handleNavClick = useCallback((action: string) => {
     switch (action) {
       case 'payout':
         navigate('/set-up-payouts');
@@ -25,15 +33,7 @@ const DashboardNav: React.FC = () => {
       default:
         break;
     }
-  };
-
-  const handleStatisticsClick = () => {
-    // TODO: Implement statistics navigation
-  };
-
-  const handleMoreClick = () => {
-    // TODO: Implement more options
-  };
+  }, [navigate, handleStatisticsClick, handleMoreClick]);
 
   return (
     <div className={styles.navContainer}>
