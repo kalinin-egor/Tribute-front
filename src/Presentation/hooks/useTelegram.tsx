@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 
 interface TelegramUser {
   id: number;
@@ -174,13 +174,14 @@ export const TelegramProvider: React.FC<TelegramProviderProps> = ({ children }) 
     }
   }, []);
 
-  const value: TelegramContextType = {
+  // Стабилизируем объект value с помощью useMemo
+  const value: TelegramContextType = useMemo(() => ({
     webApp,
     user,
     isReady,
     theme,
     themeParams,
-  };
+  }), [webApp, user, isReady, theme, themeParams]);
 
   return (
     <TelegramContext.Provider value={value}>

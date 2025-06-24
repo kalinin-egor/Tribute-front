@@ -122,11 +122,12 @@ export const AppStateProvider: FC<{children: ReactNode}> = ({ children }) => {
     }
   }, [isReady, checkDashboard]);
 
-  const value = {
+  // Стабилизируем объект value с помощью useMemo
+  const value = useMemo(() => ({
     ...state,
     onboardUser,
     refreshDashboard,
-  };
+  }), [state, onboardUser, refreshDashboard]);
 
   return (
     <AppStateContext.Provider value={value}>

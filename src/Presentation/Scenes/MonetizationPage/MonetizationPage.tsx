@@ -15,9 +15,13 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
   
-  // Стабилизируем ссылку на onboardUser
+  // Стабилизируем ссылки на функции и объекты
   const onboardUserRef = useRef(onboardUser);
+  const webAppRef = useRef(webApp);
+  
+  // Обновляем refs при изменении значений
   onboardUserRef.current = onboardUser;
+  webAppRef.current = webApp;
 
   const features: Feature[] = useMemo(() => [
     {
@@ -74,25 +78,25 @@ const MonetizationPage: React.FC<MonetizationPageProps> = () => {
     if (!termsAccepted || isOnboarding) return;
 
     setIsOnboarding(true);
-    if (isTelegramWebApp() && webApp) {
-      webApp.MainButton.showProgress();
+    if (isTelegramWebApp() && webAppRef.current) {
+      webAppRef.current.MainButton.showProgress();
     }
 
     try {
       await onboardUserRef.current();
     } catch (error) {
       console.error('Onboarding failed:', error);
-      if (isTelegramWebApp() && webApp) {
-        webApp.HapticFeedback.notificationOccurred('error');
+      if (isTelegramWebApp() && webAppRef.current) {
+        webAppRef.current.HapticFeedback.notificationOccurred('error');
       }
       alert('Ошибка при регистрации. Попробуйте еще раз.');
     } finally {
       setIsOnboarding(false);
-      if (isTelegramWebApp() && webApp) {
-        webApp.MainButton.hideProgress();
+      if (isTelegramWebApp() && webAppRef.current) {
+        webAppRef.current.MainButton.hideProgress();
       }
     }
-  }, [termsAccepted, isOnboarding, webApp]);
+  }, [termsAccepted, isOnboarding]);
 
   const handleTermsChange = useCallback((accepted: boolean) => {
     setTermsAccepted(accepted);
