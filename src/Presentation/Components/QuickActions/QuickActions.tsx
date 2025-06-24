@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { ChannelDTO } from '../../../Domain/types';
 import styles from './QuickActions.module.css';
-import StoryViewer from '../../Scenes/CreatorDashboardPage/components/StoryViewer/StoryViewer';
+import StoryViewer from '../StoryViewer/StoryViewer';
 
 // @ts-ignore
 const images = require.context('../../../assets/quickActions', true, /\.png$/);
